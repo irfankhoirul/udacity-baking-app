@@ -5,11 +5,22 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.irfankhoirul.recipe.R;
 
+import butterknife.ButterKnife;
+
 public class RecipeListActivity extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
+        ButterKnife.bind(this);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fl_container, new RecipeListFragment())
+                    .commit();
+        }
     }
+
 }

@@ -17,4 +17,5 @@
 package com.irfankhoirul.recipe.util;
 
 public class NetworkUtils {
+
 }
