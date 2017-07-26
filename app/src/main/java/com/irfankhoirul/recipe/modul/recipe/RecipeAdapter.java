@@ -52,7 +52,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
 
-        setImageThumbnail(holder, recipe.getThumbnail());
+        setImageThumbnail(holder, recipe.getImage());
 
     }
 

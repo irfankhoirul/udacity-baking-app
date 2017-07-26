@@ -13,9 +13,9 @@ import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
-import com.irfankhoirul.recipe.data.source.recipe.RequestResponseListener;
-import com.irfankhoirul.recipe.data.source.recipe.remote.RemoteRecipeRecipeDataSource;
-import com.irfankhoirul.recipe.data.source.recipe.remote.RemoteRecipeRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.RequestResponseListener;
+import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeRecipeDataSource;
+import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeRecipeDataSourceImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -55,27 +55,22 @@ public class RecipeListViewModel extends AndroidViewModel implements RecipeListC
                     recipes.addAll(result);
                     for (int i = 0; i < result.size(); i++) {
                         Recipe recipe = recipes.get(i);
-                        if (recipe.getThumbnail() == null) {
-                            if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
-                                Log.v("Thumbnail:" + i, "FromImage");
-                                recipe.setThumbnail(recipe.getImage());
-                            } else {
-                                int stepCount = recipe.getSteps().size();
-                                for (int j = stepCount - 1; j >= 0; j--) {
-                                    if (recipe.getSteps().get(j).getThumbnailURL() != null &&
-                                            !recipe.getSteps().get(j).getThumbnailURL().isEmpty()) {
-                                        Log.v("Thumbnail:" + i, "FromVideoThumbnail");
-                                        recipe.setThumbnail(recipe.getSteps().get(j).getThumbnailURL());
-                                        break;
-                                    } else if (recipe.getSteps().get(j).getVideoURL() != null &&
-                                            !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
-                                        Log.v("Thumbnail:" + i, "FromVideoFrame");
-                                        String[] params = new String[2];
-                                        params[0] = recipe.getSteps().get(j).getVideoURL(); // url
-                                        params[1] = String.valueOf(i); // position
-                                        new GetVideoThumbnailTask().execute(params);
-                                        break;
-                                    }
+                        if (recipe.getImage() == null || recipe.getImage().isEmpty()) {
+                            int stepCount = recipe.getSteps().size();
+                            for (int j = stepCount - 1; j >= 0; j--) {
+                                if (recipe.getSteps().get(j).getThumbnailURL() != null &&
+                                        !recipe.getSteps().get(j).getThumbnailURL().isEmpty()) {
+                                    Log.v("Thumbnail:" + i, "FromVideoThumbnail");
+                                    recipe.setImage(recipe.getSteps().get(j).getThumbnailURL());
+                                    break;
+                                } else if (recipe.getSteps().get(j).getVideoURL() != null &&
+                                        !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
+                                    Log.v("Thumbnail:" + i, "FromVideoFrame");
+                                    String[] params = new String[2];
+                                    params[0] = recipe.getSteps().get(j).getVideoURL(); // url
+                                    params[1] = String.valueOf(i); // position
+                                    new GetVideoThumbnailTask().execute(params);
+                                    break;
                                 }
                             }
                         }
@@ -152,7 +147,7 @@ public class RecipeListViewModel extends AndroidViewModel implements RecipeListC
 
         @Override
         protected void onPostExecute(Thumbnail result) {
-            recipes.get(result.getPosition()).setThumbnail(result.getPath());
+            recipes.get(result.getPosition()).setImage(result.getPath());
             mView.updateRecipeList();
         }
     }

@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.recipe.remote;
+package com.irfankhoirul.recipe.data.source.remote;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 

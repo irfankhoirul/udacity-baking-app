@@ -80,6 +80,7 @@ public class RecipeListFragment extends LifecycleFragment
         rvRecipes.addItemDecoration(decoration);
         recipeAdapter = new RecipeAdapter(mViewModel.getLoadedRecipes(), this);
         rvRecipes.setAdapter(recipeAdapter);
+        rvRecipes.getItemAnimator().setChangeDuration(0);
     }
 
     @Override

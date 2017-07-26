@@ -1,16 +1,22 @@
 package com.irfankhoirul.recipe.data.pojo;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
+@Entity(tableName = RecipeContract.StepEntry.TABLE_NAME)
 public class Step implements Parcelable {
+
     public static final Creator<Step> CREATOR = new Creator<Step>() {
         @Override
         public Step createFromParcel(Parcel in) {
@@ -22,21 +28,32 @@ public class Step implements Parcelable {
             return new Step[size];
         }
     };
-    @SerializedName("id")
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(index = true, name = RecipeContract.StepEntry.COLUMN_ID)
+    @SerializedName(RecipeContract.StepEntry.COLUMN_ID)
     @Expose
     private int id;
-    @SerializedName("shortDescription")
+    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
+    @SerializedName(RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
     @Expose
     private String shortDescription;
-    @SerializedName("description")
+    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_DESCRIPTION)
+    @SerializedName(RecipeContract.StepEntry.COLUMN_DESCRIPTION)
     @Expose
     private String description;
-    @SerializedName("videoURL")
+    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_VIDEO_URL)
+    @SerializedName(RecipeContract.StepEntry.COLUMN_VIDEO_URL)
     @Expose
     private String videoURL;
-    @SerializedName("thumbnailURL")
+    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
+    @SerializedName(RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
     @Expose
     private String thumbnailURL;
+    /*
+    * Addition, not exist in JSON
+    * */
+    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_RECIPE_ID)
+    private int recipeId;
 
     protected Step(Parcel in) {
         id = in.readInt();
@@ -44,6 +61,7 @@ public class Step implements Parcelable {
         description = in.readString();
         videoURL = in.readString();
         thumbnailURL = in.readString();
+        recipeId = in.readInt();
     }
 
     public int getId() {
@@ -86,6 +104,14 @@ public class Step implements Parcelable {
         this.thumbnailURL = thumbnailURL;
     }
 
+    public int getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(int recipeId) {
+        this.recipeId = recipeId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -98,16 +124,6 @@ public class Step implements Parcelable {
         dest.writeString(description);
         dest.writeString(videoURL);
         dest.writeString(thumbnailURL);
-    }
-
-    @Override
-    public String toString() {
-        return "Step{" +
-                "id=" + id +
-                ", shortDescription='" + shortDescription + '\'' +
-                ", description='" + description + '\'' +
-                ", videoURL='" + videoURL + '\'' +
-                ", thumbnailURL='" + thumbnailURL + '\'' +
-                '}';
+        dest.writeInt(recipeId);
     }
 }

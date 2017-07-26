@@ -1,8 +1,8 @@
-package com.irfankhoirul.recipe.data.source.recipe.remote;
+package com.irfankhoirul.recipe.data.source.remote;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.recipe.RecipeDataSource;
-import com.irfankhoirul.recipe.data.source.recipe.RequestResponseListener;
+import com.irfankhoirul.recipe.data.source.RecipeDataSource;
+import com.irfankhoirul.recipe.data.source.RequestResponseListener;
 
 /**
  * Created by Irfan Khoirul on 7/24/2017.

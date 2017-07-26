@@ -1,10 +1,10 @@
-package com.irfankhoirul.recipe.data.source.recipe.remote;
+package com.irfankhoirul.recipe.data.source.remote;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.recipe.RequestResponseListener;
+import com.irfankhoirul.recipe.data.source.RequestResponseListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.recipe;
+package com.irfankhoirul.recipe.data.source;
 
 import java.util.ArrayList;
 

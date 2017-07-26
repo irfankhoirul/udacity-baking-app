@@ -1,10 +1,15 @@
 package com.irfankhoirul.recipe.data.pojo;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Relation;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
 
 import java.util.List;
 
@@ -12,7 +17,65 @@ import java.util.List;
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
+@Entity(tableName = RecipeContract.RecipeEntry.TABLE_NAME)
 public class Recipe implements Parcelable {
+
+    @PrimaryKey
+    @ColumnInfo(index = true, name = RecipeContract.RecipeEntry.COLUMN_ID)
+    @SerializedName(RecipeContract.RecipeEntry.COLUMN_ID)
+    @Expose
+    private int id;
+
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_NAME)
+    @SerializedName(RecipeContract.RecipeEntry.COLUMN_NAME)
+    @Expose
+    private String name;
+
+    @Relation(parentColumn = RecipeContract.RecipeEntry.COLUMN_ID,
+            entityColumn = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
+    @SerializedName(RecipeContract.RecipeEntry.ENTITY_INGREDIENTS)
+    @Expose
+    private List<Ingredient> ingredients = null;
+
+    @ColumnInfo(name = RecipeContract.RecipeEntry.ENTITY_STEPS)
+    @SerializedName(RecipeContract.RecipeEntry.ENTITY_STEPS)
+    @Expose
+    private List<Step> steps = null;
+
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_SERVINGS)
+    @SerializedName(RecipeContract.RecipeEntry.COLUMN_SERVINGS)
+    @Expose
+    private int servings;
+
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_IMAGE)
+    @SerializedName(RecipeContract.RecipeEntry.COLUMN_IMAGE)
+    @Expose
+    private String image;
+
+    /*
+    * Addition, not exist in JSON
+    * */
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_FAVORITE)
+    private boolean favorite;
+
+    /*
+    * Addition, not exist in JSON
+    * */
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_FAVORITE)
+    private boolean favorite;
+    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_DATE_ADDED)
+    private long dateAdded;
+
+    protected Recipe(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        ingredients = in.createTypedArrayList(Ingredient.CREATOR);
+        steps = in.createTypedArrayList(Step.CREATOR);
+        servings = in.readInt();
+        image = in.readString();
+        favorite = in.readByte() != 0;
+        dateAdded = in.readLong();
+    }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
         @Override
@@ -25,36 +88,6 @@ public class Recipe implements Parcelable {
             return new Recipe[size];
         }
     };
-    @SerializedName("id")
-    @Expose
-    private int id;
-    @SerializedName("name")
-    @Expose
-    private String name;
-    @SerializedName("ingredients")
-    @Expose
-    private List<Ingredient> ingredients = null;
-    @SerializedName("steps")
-    @Expose
-    private List<Step> steps = null;
-    @SerializedName("servings")
-    @Expose
-    private Integer servings;
-    @SerializedName("image")
-    @Expose
-    private String image;
-    private boolean favorite;
-    private String thumbnail;
-
-    protected Recipe(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
-        ingredients = in.createTypedArrayList(Ingredient.CREATOR);
-        steps = in.createTypedArrayList(Step.CREATOR);
-        image = in.readString();
-        favorite = in.readByte() != 0;
-        thumbnail = in.readString();
-    }
 
     public int getId() {
         return id;
@@ -88,7 +121,7 @@ public class Recipe implements Parcelable {
         this.steps = steps;
     }
 
-    public Integer getServings() {
+    public int getServings() {
         return servings;
     }
 
@@ -112,24 +145,12 @@ public class Recipe implements Parcelable {
         this.favorite = favorite;
     }
 
-    public String getThumbnail() {
-        return thumbnail;
+    public long getDateAdded() {
+        return dateAdded;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    @Override
-    public String toString() {
-        return "Recipe{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", ingredients=" + ingredients +
-                ", steps=" + steps +
-                ", servings=" + servings +
-                ", image='" + image + '\'' +
-                '}';
+    public void setDateAdded(long dateAdded) {
+        this.dateAdded = dateAdded;
     }
 
     @Override
@@ -143,8 +164,9 @@ public class Recipe implements Parcelable {
         dest.writeString(name);
         dest.writeTypedList(ingredients);
         dest.writeTypedList(steps);
+        dest.writeInt(servings);
         dest.writeString(image);
         dest.writeByte((byte) (favorite ? 1 : 0));
-        dest.writeString(thumbnail);
+        dest.writeLong(dateAdded);
     }
 }
