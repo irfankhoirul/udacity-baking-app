@@ -22,8 +22,8 @@ public class RecipeContract {
 
         public static final String AUTHORITY = "com.irfankhoirul.recipe";
 
-        public static final int CODE_MOVIE_DIRECTORY = 100;
-        public static final int CODE_MOVIE_ITEM = 101;
+        public static final int CODE_RECIPE_DIRECTORY = 100;
+        public static final int CODE_RECIPE_ITEM = 101;
 
         public static final Uri BASE_CONTENT_URI =
                 Uri.parse("content://" + AUTHORITY);

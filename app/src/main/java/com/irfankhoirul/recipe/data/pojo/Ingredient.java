@@ -2,6 +2,7 @@ package com.irfankhoirul.recipe.data.pojo;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,7 +15,10 @@ import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-@Entity(tableName = RecipeContract.IngredientEntry.TABLE_NAME)
+@Entity(tableName = RecipeContract.IngredientEntry.TABLE_NAME,
+        foreignKeys = @ForeignKey(entity = Recipe.class,
+                parentColumns = RecipeContract.RecipeEntry.COLUMN_ID,
+                childColumns = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID))
 public class Ingredient implements Parcelable {
 
     public static final Creator<Ingredient> CREATOR = new Creator<Ingredient>() {
@@ -40,21 +44,22 @@ public class Ingredient implements Parcelable {
     @SerializedName(RecipeContract.IngredientEntry.COLUMN_INGREDIENT)
     @Expose
     private String ingredient;
+
     /*
     * Addition, not exist in JSON
     * */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(index = true, name = RecipeContract.IngredientEntry.COLUMN_ID)
-    private int id;
+    private long id;
     @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
-    private int recipeId;
+    private long recipeId;
 
     protected Ingredient(Parcel in) {
         quantity = in.readDouble();
         measure = in.readString();
         ingredient = in.readString();
-        id = in.readInt();
-        recipeId = in.readInt();
+        id = in.readLong();
+        recipeId = in.readLong();
     }
 
     public double getQuantity() {
@@ -81,19 +86,19 @@ public class Ingredient implements Parcelable {
         this.ingredient = ingredient;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getRecipeId() {
+    public long getRecipeId() {
         return recipeId;
     }
 
-    public void setRecipeId(int recipeId) {
+    public void setRecipeId(long recipeId) {
         this.recipeId = recipeId;
     }
 
@@ -107,7 +112,7 @@ public class Ingredient implements Parcelable {
         dest.writeDouble(quantity);
         dest.writeString(measure);
         dest.writeString(ingredient);
-        dest.writeInt(id);
-        dest.writeInt(recipeId);
+        dest.writeLong(id);
+        dest.writeLong(recipeId);
     }
 }

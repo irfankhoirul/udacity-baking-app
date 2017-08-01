@@ -42,6 +42,7 @@ public class RecipeListViewModel extends AndroidViewModel implements RecipeListC
 
     @Override
     public void loadRecipes(int source) {
+        mView.setLoading(true, "Preparing Recipes...");
         if (recipes.size() == 0) {
             remoteRecipeRecipeDataSource.getRecipes(new RequestResponseListener<Recipe>() {
                 @Override
@@ -75,15 +76,17 @@ public class RecipeListViewModel extends AndroidViewModel implements RecipeListC
                             }
                         }
                     }
+                    mView.setLoading(false, null);
                     mView.updateRecipeList();
                 }
 
                 @Override
                 public void onFailure(Throwable throwable) {
-
+                    mView.setLoading(false, null);
                 }
             });
         } else {
+            mView.setLoading(false, null);
             mView.updateRecipeList();
         }
     }

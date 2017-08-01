@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
@@ -31,6 +33,10 @@ public class RecipeListFragment extends LifecycleFragment
 
     @BindView(R.id.rv_recipes)
     RecyclerView rvRecipes;
+    @BindView(R.id.ll_loading)
+    LinearLayout llLoading;
+    @BindView(R.id.tv_loading_message)
+    TextView tvLoadingMessage;
 
     private RecipeListViewModel mViewModel;
     private RecipeAdapter recipeAdapter;
@@ -80,7 +86,7 @@ public class RecipeListFragment extends LifecycleFragment
         rvRecipes.addItemDecoration(decoration);
         recipeAdapter = new RecipeAdapter(mViewModel.getLoadedRecipes(), this);
         rvRecipes.setAdapter(recipeAdapter);
-        rvRecipes.getItemAnimator().setChangeDuration(0);
+//        rvRecipes.getItemAnimator().setChangeDuration(0);
     }
 
     @Override
@@ -90,7 +96,14 @@ public class RecipeListFragment extends LifecycleFragment
 
     @Override
     public void setLoading(boolean status, @Nullable String message) {
-
+        if (status) {
+            rvRecipes.setVisibility(View.GONE);
+            tvLoadingMessage.setText(message);
+            llLoading.setVisibility(View.VISIBLE);
+        } else {
+            llLoading.setVisibility(View.GONE);
+            rvRecipes.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -101,7 +114,6 @@ public class RecipeListFragment extends LifecycleFragment
     @Override
     public void updateRecipeList() {
         recipeAdapter.notifyDataSetChanged();
-        Log.v("ViewNotified", "True");
     }
 
     @Override
