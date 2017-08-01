@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.RequestResponseListener;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -22,13 +21,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-public class RemoteRecipeRecipeDataSourceImpl implements RemoteRecipeRecipeDataSource {
+public class RemoteRecipeDataSourceImpl implements RemoteRecipeDataSource {
 
-    private static final String TAG = RemoteRecipeRecipeDataSourceImpl.class.getSimpleName();
+    private static final String TAG = RemoteRecipeDataSourceImpl.class.getSimpleName();
     private EndPoints endPoint;
     private CompositeDisposable mCompositeDisposable;
 
-    public RemoteRecipeRecipeDataSourceImpl() {
+    public RemoteRecipeDataSourceImpl() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -48,7 +47,7 @@ public class RemoteRecipeRecipeDataSourceImpl implements RemoteRecipeRecipeDataS
     }
 
     @Override
-    public void getRecipes(final RequestResponseListener<Recipe> responseListener) {
+    public void getRecipes(final RemoteResponseListener<Recipe> responseListener) {
         Call<ArrayList<Recipe>> call = endPoint.getRecipes();
         call.enqueue(new Callback<ArrayList<Recipe>>() {
             @Override

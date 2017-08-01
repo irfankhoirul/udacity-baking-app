@@ -32,23 +32,28 @@ public class Step implements Parcelable {
             return new Step[size];
         }
     };
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(index = true, name = RecipeContract.StepEntry.COLUMN_ID)
     @SerializedName(RecipeContract.StepEntry.COLUMN_ID)
     @Expose
     private long id;
+
     @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
     @SerializedName(RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
     @Expose
     private String shortDescription;
+
     @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_DESCRIPTION)
     @SerializedName(RecipeContract.StepEntry.COLUMN_DESCRIPTION)
     @Expose
     private String description;
+
     @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_VIDEO_URL)
     @SerializedName(RecipeContract.StepEntry.COLUMN_VIDEO_URL)
     @Expose
     private String videoURL;
+
     @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
     @SerializedName(RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
     @Expose
@@ -57,8 +62,11 @@ public class Step implements Parcelable {
     /*
     * Addition, not exist in JSON
     * */
-    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_RECIPE_ID)
+    @ColumnInfo(index = true, name = RecipeContract.StepEntry.COLUMN_RECIPE_ID)
     private long recipeId;
+
+    public Step() {
+    }
 
     protected Step(Parcel in) {
         id = in.readLong();
@@ -130,5 +138,17 @@ public class Step implements Parcelable {
         dest.writeString(videoURL);
         dest.writeString(thumbnailURL);
         dest.writeLong(recipeId);
+    }
+
+    @Override
+    public String toString() {
+        return "Step{" +
+                "id=" + id +
+                ", shortDescription='" + shortDescription + '\'' +
+                ", description='" + description + '\'' +
+                ", videoURL='" + videoURL + '\'' +
+                ", thumbnailURL='" + thumbnailURL + '\'' +
+                ", recipeId=" + recipeId +
+                '}';
     }
 }

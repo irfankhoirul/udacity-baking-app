@@ -24,11 +24,6 @@ import com.irfankhoirul.recipe.data.source.local.db.dao.StepDao;
 
 import java.util.ArrayList;
 
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeContract.RecipeEntry.AUTHORITY;
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY;
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeContract.RecipeEntry.CODE_RECIPE_ITEM;
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeContract.RecipeEntry.TABLE_NAME;
-
 /**
  * Created by Irfan Khoirul on 7/25/2017.
  */
@@ -37,8 +32,18 @@ public class RecipeContentProvider extends ContentProvider {
     private static final UriMatcher MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        MATCHER.addURI(AUTHORITY, TABLE_NAME, CODE_RECIPE_DIRECTORY);
-        MATCHER.addURI(AUTHORITY, TABLE_NAME + "/#", CODE_RECIPE_ITEM);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.RecipeEntry.TABLE_NAME,
+                RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.RecipeEntry.TABLE_NAME + "/#",
+                RecipeContract.RecipeEntry.CODE_RECIPE_ITEM);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.IngredientEntry.TABLE_NAME,
+                RecipeContract.IngredientEntry.CODE_INGREDIENT_DIRECTORY);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.IngredientEntry.TABLE_NAME + "/#",
+                RecipeContract.IngredientEntry.CODE_INGREDIENT_ITEM);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.StepEntry.TABLE_NAME,
+                RecipeContract.StepEntry.CODE_STEP_DIRECTORY);
+        MATCHER.addURI(RecipeContract.AUTHORITY, RecipeContract.StepEntry.TABLE_NAME + "/#",
+                RecipeContract.StepEntry.CODE_STEP_ITEM);
     }
 
     private RecipeDao recipeDao;
@@ -60,31 +65,66 @@ public class RecipeContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        final int code = MATCHER.match(uri);
-        if (code == CODE_RECIPE_DIRECTORY || code == CODE_RECIPE_ITEM) {
-            final Cursor cursor;
-            if (code == CODE_RECIPE_DIRECTORY) {
-                cursor = recipeDao.selectAllWithChildElements();
-            } else {
-                cursor = recipeDao.selectByIdWithChildElements(ContentUris.parseId(uri));
-            }
-            cursor.setNotificationUri(context.getContentResolver(), uri);
-            return cursor;
-        } else {
-            throw new IllegalArgumentException("Unknown URI: " + uri);
+    public String getType(@NonNull Uri uri) {
+        switch (MATCHER.match(uri)) {
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY:
+                return "vnd.android.cursor.dir/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.RecipeEntry.TABLE_NAME;
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM:
+                return "vnd.android.cursor.item/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.RecipeEntry.TABLE_NAME;
+
+            case RecipeContract.IngredientEntry.CODE_INGREDIENT_DIRECTORY:
+                return "vnd.android.cursor.dir/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.IngredientEntry.TABLE_NAME;
+            case RecipeContract.IngredientEntry.CODE_INGREDIENT_ITEM:
+                return "vnd.android.cursor.item/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.IngredientEntry.TABLE_NAME;
+
+            case RecipeContract.StepEntry.CODE_STEP_DIRECTORY:
+                return "vnd.android.cursor.dir/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.StepEntry.TABLE_NAME;
+            case RecipeContract.StepEntry.CODE_STEP_ITEM:
+                return "vnd.android.cursor.item/" + RecipeContract.AUTHORITY + "." +
+                        RecipeContract.StepEntry.TABLE_NAME;
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
         }
     }
 
     @Nullable
     @Override
-    public String getType(@NonNull Uri uri) {
-        switch (MATCHER.match(uri)) {
-            case CODE_RECIPE_DIRECTORY:
-                return "vnd.android.cursor.dir/" + AUTHORITY + "." + TABLE_NAME;
-            case CODE_RECIPE_ITEM:
-                return "vnd.android.cursor.item/" + AUTHORITY + "." + TABLE_NAME;
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
+                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        final int code = MATCHER.match(uri);
+        Cursor cursor;
+        switch (code) {
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY: {
+                cursor = recipeDao.selectAll();
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
+            }
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM: {
+                cursor = recipeDao.selectById(ContentUris.parseId(uri));
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
+            }
+            case RecipeContract.IngredientEntry.CODE_INGREDIENT_DIRECTORY:
+                cursor = ingredientDao.selectAll();
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
+            case RecipeContract.IngredientEntry.CODE_INGREDIENT_ITEM:
+                cursor = ingredientDao.selectById(ContentUris.parseId(uri));
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
+            case RecipeContract.StepEntry.CODE_STEP_DIRECTORY:
+                cursor = stepDao.selectAll();
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
+            case RecipeContract.StepEntry.CODE_STEP_ITEM:
+                cursor = stepDao.selectById(ContentUris.parseId(uri));
+                cursor.setNotificationUri(context.getContentResolver(), uri);
+                return cursor;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -94,7 +134,7 @@ public class RecipeContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         switch (MATCHER.match(uri)) {
-            case CODE_RECIPE_DIRECTORY:
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY:
                 Recipe recipe = Recipe.fromContentValues(values);
                 final long recipeId = recipeDao.insert(recipe);
                 if (recipeId > 0) {
@@ -110,7 +150,7 @@ public class RecipeContentProvider extends ContentProvider {
                 } else {
                     throw new SQLiteException("Failed to insert row into URI: " + uri);
                 }
-            case CODE_RECIPE_ITEM:
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM:
                 throw new IllegalArgumentException("Invalid URI, cannot insert with ID: " + uri);
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -152,7 +192,7 @@ public class RecipeContentProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] valuesArray) {
         switch (MATCHER.match(uri)) {
-            case CODE_RECIPE_DIRECTORY:
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY:
                 final Context context = getContext();
                 if (context == null) {
                     return 0;
@@ -169,7 +209,7 @@ public class RecipeContentProvider extends ContentProvider {
                     // Insert steps
                     bulkInsertSteps(recipes[i], recipeIds[i]);
                 }
-            case CODE_RECIPE_ITEM:
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM:
                 throw new IllegalArgumentException("Invalid URI, cannot insert with ID: " + uri);
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -179,11 +219,20 @@ public class RecipeContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection,
                       @Nullable String[] selectionArgs) {
+        int count;
         switch (MATCHER.match(uri)) {
-            case CODE_RECIPE_DIRECTORY:
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY:
                 throw new IllegalArgumentException("Invalid URI, cannot update without ID" + uri);
-            case CODE_RECIPE_ITEM:
-                final int count = recipeDao.deleteById(ContentUris.parseId(uri));
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM:
+                count = recipeDao.deleteById(ContentUris.parseId(uri));
+                context.getContentResolver().notifyChange(uri, null);
+                return count;
+            case RecipeContract.IngredientEntry.CODE_INGREDIENT_ITEM:
+                count = ingredientDao.deleteById(ContentUris.parseId(uri));
+                context.getContentResolver().notifyChange(uri, null);
+                return count;
+            case RecipeContract.StepEntry.CODE_STEP_ITEM:
+                count = stepDao.deleteById(ContentUris.parseId(uri));
                 context.getContentResolver().notifyChange(uri, null);
                 return count;
             default:
@@ -195,10 +244,13 @@ public class RecipeContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
                       @Nullable String[] selectionArgs) {
         switch (MATCHER.match(uri)) {
-            case CODE_RECIPE_DIRECTORY:
-                throw new IllegalArgumentException("Not implemented yet" + uri);
-            case CODE_RECIPE_ITEM:
-                throw new IllegalArgumentException("Not implemented yet" + uri);
+            case RecipeContract.RecipeEntry.CODE_RECIPE_DIRECTORY:
+                throw new IllegalArgumentException("Invalid URI, cannot update without ID" + uri);
+            case RecipeContract.RecipeEntry.CODE_RECIPE_ITEM:
+                final Recipe recipe = Recipe.fromContentValues(values);
+                final int count = recipeDao.update(recipe);
+                context.getContentResolver().notifyChange(uri, null);
+                return count;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -223,6 +275,5 @@ public class RecipeContentProvider extends ContentProvider {
             database.endTransaction();
         }
     }
-
 
 }

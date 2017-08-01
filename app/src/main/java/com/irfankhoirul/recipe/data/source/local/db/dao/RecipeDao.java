@@ -60,7 +60,8 @@ public interface RecipeDao {
             RecipeContract.StepEntry.TABLE_NAME + "." +
             RecipeContract.StepEntry.COLUMN_RECIPE_ID + " = " +
             RecipeContract.RecipeEntry.TABLE_NAME + "." + RecipeContract.RecipeEntry.COLUMN_ID +
-            " WHERE " + RecipeContract.RecipeEntry.COLUMN_ID + " = :id")
+            " WHERE " + RecipeContract.RecipeEntry.TABLE_NAME + "." +
+            RecipeContract.RecipeEntry.COLUMN_ID + " = :id")
     Cursor selectByIdWithChildElements(long id);
 
     @Query("DELETE FROM " + RecipeContract.RecipeEntry.TABLE_NAME + " WHERE "

@@ -31,7 +31,14 @@
                 android:resource="@xml/recipe_widget_info" />
         </receiver>
 
-        <activity android:name=".modul.step.StepActivity"></activity>
+        <activity android:name=".modul.step.StepActivity" />
+
+        <provider
+            android:name=".data.source.local.db.RecipeContentProvider"
+            android:authorities="com.irfankhoirul.recipe"
+            android:exported="true"
+            android:permission="com.irfankhoirul.recipe.data.source.local.db.READ_WRITE" />
+
     </application>
 
 </manifest>

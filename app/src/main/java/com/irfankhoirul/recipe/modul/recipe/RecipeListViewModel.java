@@ -4,8 +4,10 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -13,9 +15,13 @@ import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
-import com.irfankhoirul.recipe.data.source.RequestResponseListener;
-import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeRecipeDataSource;
-import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.local.LocalDataObserver;
+import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSource;
+import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeDataSource;
+import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.remote.RemoteResponseListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -30,65 +36,108 @@ import retrofit2.Call;
 public class RecipeListViewModel extends AndroidViewModel implements RecipeListContract.ViewModel {
 
     private final RecipeListContract.View mView;
-    private final RemoteRecipeRecipeDataSource remoteRecipeRecipeDataSource;
+    private final RemoteRecipeDataSource remoteRecipeDataSource;
+    private final LocalRecipeDataSource localRecipeDataSource;
     private Call<Recipe> recipeRequest;
     private ArrayList<Recipe> recipes = new ArrayList<>();
 
     public RecipeListViewModel(Application application, RecipeListContract.View mView) {
         super(application);
         this.mView = mView;
-        remoteRecipeRecipeDataSource = new RemoteRecipeRecipeDataSourceImpl();
+        remoteRecipeDataSource = new RemoteRecipeDataSourceImpl();
+        localRecipeDataSource = new LocalRecipeDataSourceImpl(application.getApplicationContext());
     }
 
     @Override
     public void loadRecipes(int source) {
         mView.setLoading(true, "Preparing Recipes...");
         if (recipes.size() == 0) {
-            remoteRecipeRecipeDataSource.getRecipes(new RequestResponseListener<Recipe>() {
+            // Try to Get From Cache First
+            localRecipeDataSource.getAll(new LocalDataObserver<Cursor>() {
                 @Override
-                public void onRequestStart(Call<Recipe> call) {
-                    recipeRequest = call;
-                }
-
-                @Override
-                public void onSuccess(ArrayList<Recipe> result) {
-                    recipes.clear();
-                    recipes.addAll(result);
-                    for (int i = 0; i < result.size(); i++) {
-                        Recipe recipe = recipes.get(i);
-                        if (recipe.getImage() == null || recipe.getImage().isEmpty()) {
-                            int stepCount = recipe.getSteps().size();
-                            for (int j = stepCount - 1; j >= 0; j--) {
-                                if (recipe.getSteps().get(j).getThumbnailURL() != null &&
-                                        !recipe.getSteps().get(j).getThumbnailURL().isEmpty()) {
-                                    Log.v("Thumbnail:" + i, "FromVideoThumbnail");
-                                    recipe.setImage(recipe.getSteps().get(j).getThumbnailURL());
-                                    break;
-                                } else if (recipe.getSteps().get(j).getVideoURL() != null &&
-                                        !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
-                                    Log.v("Thumbnail:" + i, "FromVideoFrame");
-                                    String[] params = new String[2];
-                                    params[0] = recipe.getSteps().get(j).getVideoURL(); // url
-                                    params[1] = String.valueOf(i); // position
-                                    new GetVideoThumbnailTask().execute(params);
-                                    break;
-                                }
-                            }
+                public void onNext(@io.reactivex.annotations.NonNull Cursor cursor) {
+                    if (cursor.getCount() > 0) {
+                        ArrayList<Recipe> cachedRecipes = new ArrayList<>();
+                        while (cursor.moveToNext()) {
+                            Recipe recipe = new Recipe();
+                            recipe.setId(cursor.getLong(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_ID)));
+                            recipe.setImage(cursor.getString(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_IMAGE)));
+                            recipe.setFavorite(cursor.getInt(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_FAVORITE)) == 1);
+                            recipe.setDateAdded(cursor.getLong(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_DATE_ADDED)));
+                            recipe.setName(cursor.getString(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_NAME)));
+                            recipe.setServings(cursor.getInt(cursor.getColumnIndex(RecipeContract.RecipeEntry.COLUMN_SERVINGS)));
+                            Log.v("CachedRecipe", recipe.toString());
+                            cachedRecipes.add(recipe);
                         }
+                        recipes.clear();
+                        recipes.addAll(cachedRecipes);
+                        mView.setLoading(false, null);
+                        mView.updateRecipeList();
+                    } else {
+                        getRecipeFromRemote();
                     }
-                    mView.setLoading(false, null);
-                    mView.updateRecipeList();
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
-                    mView.setLoading(false, null);
+                public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                    super.onError(e);
+                    getRecipeFromRemote();
                 }
             });
         } else {
             mView.setLoading(false, null);
             mView.updateRecipeList();
         }
+    }
+
+    private void getRecipeFromRemote() {
+        remoteRecipeDataSource.getRecipes(new RemoteResponseListener<Recipe>() {
+            @Override
+            public void onRequestStart(Call<Recipe> call) {
+                recipeRequest = call;
+            }
+
+            @Override
+            public void onSuccess(ArrayList<Recipe> result) {
+                recipes.clear();
+                recipes.addAll(result);
+                makeRecipeCache(result);
+                for (int i = 0; i < result.size(); i++) {
+                    Recipe recipe = recipes.get(i);
+                    if (recipe.getImage() == null || recipe.getImage().isEmpty()) {
+                        int stepCount = recipe.getSteps().size();
+                        for (int j = stepCount - 1; j >= 0; j--) {
+                            if (recipe.getSteps().get(j).getThumbnailURL() != null &&
+                                    !recipe.getSteps().get(j).getThumbnailURL().isEmpty()) {
+                                Log.v("Thumbnail:" + i, "FromVideoThumbnail");
+                                recipe.setImage(recipe.getSteps().get(j).getThumbnailURL());
+                                break;
+                            } else if (recipe.getSteps().get(j).getVideoURL() != null &&
+                                    !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
+                                Log.v("Thumbnail:" + i, "FromVideoFrame");
+                                String[] params = new String[2];
+                                params[0] = recipe.getSteps().get(j).getVideoURL(); // url
+                                params[1] = String.valueOf(i); // position
+                                new GetVideoThumbnailTask().execute(params);
+                                break;
+                            }
+                        }
+                    }
+                }
+                mView.setLoading(false, null);
+                mView.updateRecipeList();
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                mView.setLoading(false, null);
+            }
+        });
+    }
+
+    private void makeRecipeCache(ArrayList<Recipe> recipes) {
+        localRecipeDataSource.insertMany(recipes, new LocalDataObserver<Uri>() {
+        });
     }
 
     @Override
@@ -151,6 +200,7 @@ public class RecipeListViewModel extends AndroidViewModel implements RecipeListC
         @Override
         protected void onPostExecute(Thumbnail result) {
             recipes.get(result.getPosition()).setImage(result.getPath());
+            localRecipeDataSource.update(recipes.get(result.getPosition()), new LocalDataObserver<Integer>());
             mView.updateRecipeList();
         }
     }

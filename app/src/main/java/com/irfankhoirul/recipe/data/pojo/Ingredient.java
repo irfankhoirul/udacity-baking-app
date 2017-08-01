@@ -32,14 +32,17 @@ public class Ingredient implements Parcelable {
             return new Ingredient[size];
         }
     };
+
     @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_QUANTITY)
     @SerializedName(RecipeContract.IngredientEntry.COLUMN_QUANTITY)
     @Expose
     private double quantity;
+
     @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_MEASURE)
     @SerializedName(RecipeContract.IngredientEntry.COLUMN_MEASURE)
     @Expose
     private String measure;
+
     @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_INGREDIENT)
     @SerializedName(RecipeContract.IngredientEntry.COLUMN_INGREDIENT)
     @Expose
@@ -51,8 +54,12 @@ public class Ingredient implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(index = true, name = RecipeContract.IngredientEntry.COLUMN_ID)
     private long id;
-    @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
+
+    @ColumnInfo(index = true, name = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
     private long recipeId;
+
+    public Ingredient() {
+    }
 
     protected Ingredient(Parcel in) {
         quantity = in.readDouble();
@@ -114,5 +121,16 @@ public class Ingredient implements Parcelable {
         dest.writeString(ingredient);
         dest.writeLong(id);
         dest.writeLong(recipeId);
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "quantity=" + quantity +
+                ", measure='" + measure + '\'' +
+                ", ingredient='" + ingredient + '\'' +
+                ", id=" + id +
+                ", recipeId=" + recipeId +
+                '}';
     }
 }
