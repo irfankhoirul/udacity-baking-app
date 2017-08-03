@@ -7,8 +7,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.irfankhoirul.recipe.data.pojo.Ingredient;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.pojo.Step;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import java.util.ArrayList;
 
@@ -34,21 +36,31 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
     }
 
     @Override
-    public void getAll(LocalDataObserver<Cursor> cursorFavoriteDataObserver) {
-        Observable.create(new ObservableOnSubscribe<Cursor>() {
+    public void getAll(LocalDataObserver<ArrayList<Recipe>> dataObserver) {
+        Observable.create(new ObservableOnSubscribe<ArrayList<Recipe>>() {
             @Override
-            public void subscribe(@NonNull ObservableEmitter<Cursor> e) throws Exception {
+            public void subscribe(@NonNull ObservableEmitter<ArrayList<Recipe>> e) throws Exception {
                 // Get Recipe List
-                Cursor cursor = context.getContentResolver()
-                        .query(RecipeContract.RecipeEntry.RECIPE_CONTENT_URI,
+                Cursor recipeCursor = context.getContentResolver()
+                        .query(RecipeDataContract.RecipeEntry.RECIPE_CONTENT_URI,
                                 null,
                                 null,
                                 null,
-                                RecipeContract.RecipeEntry.COLUMN_DATE_ADDED + " DESC");
+                                RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED + " DESC");
 
-                if (cursor != null) {
-                    Log.d("QueryCursor", String.valueOf(cursor.getCount()));
-                    e.onNext(cursor);
+                ArrayList<Recipe> recipes = new ArrayList<>();
+                if (recipeCursor != null) {
+                    while (recipeCursor.moveToNext()) {
+                        Recipe recipe = getRecipeFromCursor(recipeCursor);
+                        recipes.add(recipe);
+                    }
+                    recipeCursor.close();
+
+                    for (int i = 0; i < recipes.size(); i++) {
+                        recipes.get(i).setIngredients(getIngredients(recipes, i));
+                        recipes.get(i).setSteps(getSteps(recipes, i));
+                    }
+                    e.onNext(recipes);
                 } else {
                     e.onError(new NullPointerException("Failed to query all data"));
                 }
@@ -56,7 +68,118 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cursorFavoriteDataObserver);
+                .subscribe(dataObserver);
+    }
+
+    @android.support.annotation.NonNull
+    private ArrayList<Ingredient> getIngredients(ArrayList<Recipe> recipes, int recipePosition) {
+        Uri baseIngredientUri = RecipeDataContract
+                .IngredientEntry
+                .INGREDIENT_CONTENT_ITEM_URI.build();
+
+        String ingredientUriString = baseIngredientUri.toString() + "/" + recipes.get(recipePosition).getId();
+        Uri ingredientUri = Uri.parse(ingredientUriString);
+
+        Log.v("IngredientUri", ingredientUri.toString());
+        Cursor ingredientCursor = context.getContentResolver()
+                .query(ingredientUri,
+                        null,
+                        null,
+                        null,
+                        RecipeDataContract.IngredientEntry.COLUMN_ID + " ASC");
+
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        if (ingredientCursor != null) {
+            while (ingredientCursor.moveToNext()) {
+                Ingredient ingredient = getIngredientFromCursor(ingredientCursor);
+                Log.v("IngredientFromCursor", ingredient.toString());
+                ingredients.add(ingredient);
+            }
+            ingredientCursor.close();
+        }
+        return ingredients;
+    }
+
+    @android.support.annotation.NonNull
+    private ArrayList<Step> getSteps(ArrayList<Recipe> recipes, int recipePosition) {
+        Uri baseStepUri = RecipeDataContract
+                .StepEntry
+                .STEP_CONTENT_ITEM_URI.build();
+
+        String stepUriString = baseStepUri.toString() + "/" + recipes.get(recipePosition).getId();
+        Uri stepUri = Uri.parse(stepUriString);
+
+        Log.v("StepUri", stepUri.toString());
+
+        Cursor stepCursor = context.getContentResolver()
+                .query(stepUri,
+                        null,
+                        null,
+                        null,
+                        RecipeDataContract.StepEntry.COLUMN_ID + " ASC");
+
+        ArrayList<Step> steps = new ArrayList<>();
+        if (stepCursor != null) {
+            while (stepCursor.moveToNext()) {
+                Step step = getStepFromCursor(stepCursor);
+                Log.v("StepFromCursor", step.toString());
+                steps.add(step);
+            }
+            stepCursor.close();
+        }
+        return steps;
+    }
+
+    @android.support.annotation.NonNull
+    private Ingredient getIngredientFromCursor(Cursor ingredientCursor) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(ingredientCursor.getLong(ingredientCursor
+                .getColumnIndex(RecipeDataContract.IngredientEntry.COLUMN_ID)));
+        ingredient.setRecipeId(ingredientCursor.getLong(ingredientCursor
+                .getColumnIndex(RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID)));
+        ingredient.setIngredient(ingredientCursor.getString(ingredientCursor
+                .getColumnIndex(RecipeDataContract.IngredientEntry.COLUMN_INGREDIENT)));
+        ingredient.setQuantity(ingredientCursor.getDouble(ingredientCursor
+                .getColumnIndex(RecipeDataContract.IngredientEntry.COLUMN_QUANTITY)));
+        ingredient.setMeasure(ingredientCursor.getString(ingredientCursor
+                .getColumnIndex(RecipeDataContract.IngredientEntry.COLUMN_MEASURE)));
+        return ingredient;
+    }
+
+    @android.support.annotation.NonNull
+    private Step getStepFromCursor(Cursor stepCursor) {
+        Step step = new Step();
+        step.setId(stepCursor.getLong(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_ID)));
+        step.setRecipeId(stepCursor.getLong(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_RECIPE_ID)));
+        step.setShortDescription(stepCursor.getString(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_SHORT_DESCRIPTION)));
+        step.setDescription(stepCursor.getString(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_DESCRIPTION)));
+        step.setThumbnailURL(stepCursor.getString(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_THUMBNAIL_URL)));
+        step.setVideoURL(stepCursor.getString(stepCursor
+                .getColumnIndex(RecipeDataContract.StepEntry.COLUMN_VIDEO_URL)));
+        return step;
+    }
+
+    @android.support.annotation.NonNull
+    private Recipe getRecipeFromCursor(Cursor recipeCursor) {
+        Recipe recipe = new Recipe();
+        recipe.setId(recipeCursor.getLong(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_ID)));
+        recipe.setImage(recipeCursor.getString(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_IMAGE)));
+        recipe.setFavorite(recipeCursor.getInt(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_FAVORITE)) == 1);
+        recipe.setDateAdded(recipeCursor.getLong(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED)));
+        recipe.setName(recipeCursor.getString(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_NAME)));
+        recipe.setServings(recipeCursor.getInt(recipeCursor.getColumnIndex(
+                RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)));
+        return recipe;
     }
 
     @Override
@@ -65,13 +188,13 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
             @Override
             public void subscribe(@NonNull ObservableEmitter<Cursor> e) throws Exception {
                 String stringId = Long.toString(id);
-                Uri uri = RecipeContract.RecipeEntry.RECIPE_CONTENT_URI.buildUpon().appendPath(stringId).build();
+                Uri uri = RecipeDataContract.RecipeEntry.RECIPE_CONTENT_URI.buildUpon().appendPath(stringId).build();
                 Cursor cursor = context.getContentResolver()
                         .query(uri,
                                 null,
-                                RecipeContract.RecipeEntry.COLUMN_ID + " = ?",
+                                RecipeDataContract.RecipeEntry.COLUMN_ID + " = ?",
                                 new String[]{String.valueOf(id)},
-                                RecipeContract.RecipeEntry.COLUMN_DATE_ADDED + " DESC");
+                                RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED + " DESC");
 
                 if (cursor != null) {
                     Log.d("QueryCursor", String.valueOf(cursor.getCount()));
@@ -103,7 +226,7 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
         ContentValues contentValues = getContentValues(recipe);
 
         Uri uri = context.getContentResolver()
-                .insert(RecipeContract.RecipeEntry.RECIPE_CONTENT_URI, contentValues);
+                .insert(RecipeDataContract.RecipeEntry.RECIPE_CONTENT_URI, contentValues);
         if (uri != null) {
             Log.d("InsertUri", uri.toString());
             e.onNext(uri);
@@ -136,7 +259,7 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
             public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
 
                 String stringId = Long.toString(recipe.getId());
-                Uri uri = RecipeContract.RecipeEntry.RECIPE_CONTENT_URI;
+                Uri uri = RecipeDataContract.RecipeEntry.RECIPE_CONTENT_URI;
                 uri = uri.buildUpon().appendPath(stringId).build();
 
                 ContentValues contentValues = getContentValues(recipe);
@@ -159,15 +282,15 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
     @android.support.annotation.NonNull
     private ContentValues getContentValues(Recipe recipe) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_ID, recipe.getId());
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_NAME, recipe.getName());
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_SERVINGS, recipe.getServings());
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_IMAGE, recipe.getImage());
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_FAVORITE, recipe.isFavorite());
-        contentValues.put(RecipeContract.RecipeEntry.COLUMN_DATE_ADDED, recipe.getDateAdded());
-        contentValues.put(RecipeContract.RecipeEntry.ENTITY_INGREDIENTS,
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_ID, recipe.getId());
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_NAME, recipe.getName());
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_SERVINGS, recipe.getServings());
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_IMAGE, recipe.getImage());
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_FAVORITE, recipe.isFavorite());
+        contentValues.put(RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED, recipe.getDateAdded());
+        contentValues.put(RecipeDataContract.RecipeEntry.ENTITY_INGREDIENTS,
                 new Gson().toJson(recipe.getIngredients()));
-        contentValues.put(RecipeContract.RecipeEntry.ENTITY_STEPS,
+        contentValues.put(RecipeDataContract.RecipeEntry.ENTITY_STEPS,
                 new Gson().toJson(recipe.getSteps()));
         return contentValues;
     }
@@ -179,7 +302,7 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
             public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
 
                 String stringId = Long.toString(id);
-                Uri uri = RecipeContract.RecipeEntry.RECIPE_CONTENT_URI;
+                Uri uri = RecipeDataContract.RecipeEntry.RECIPE_CONTENT_URI;
                 uri = uri.buildUpon().appendPath(stringId).build();
 
                 int count = context.getContentResolver().delete(uri, null, null);

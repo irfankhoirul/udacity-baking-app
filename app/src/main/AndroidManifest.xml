@@ -12,14 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".modul.recipe.RecipeListActivity">
+        <activity android:name=".modul.recipe.RecipeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".modul.recipe_detail.RecipeDetailActivity" />
+        <activity android:name=".modul.step.StepActivity" />
 
         <receiver android:name=".modul.widget.RecipeWidget">
             <intent-filter>
@@ -39,6 +39,8 @@
             android:exported="true"
             android:permission="com.irfankhoirul.recipe.data.source.local.db.READ_WRITE" />
 
+        <activity android:name=".modul.step_detail.StepDetailActivity" />
+        <activity android:name=".modul.recipe_detail.RecipeDetailActivity"></activity>
     </application>
 
 </manifest>

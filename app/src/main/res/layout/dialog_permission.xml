@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:tint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_verified_user_black_24dp" />
@@ -20,18 +21,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         android:layout_weight="1"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Storage Permission"
-            android:textColor="@color/pure_black"
-            tools:layout_editor_absoluteY="213dp" />
 
         <TextView
             android:id="@+id/textView2"

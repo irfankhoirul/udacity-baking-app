@@ -9,16 +9,16 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-@Entity(tableName = RecipeContract.IngredientEntry.TABLE_NAME,
+@Entity(tableName = RecipeDataContract.IngredientEntry.TABLE_NAME,
         foreignKeys = @ForeignKey(entity = Recipe.class,
-                parentColumns = RecipeContract.RecipeEntry.COLUMN_ID,
-                childColumns = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID))
+                parentColumns = RecipeDataContract.RecipeEntry.COLUMN_ID,
+                childColumns = RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID))
 public class Ingredient implements Parcelable {
 
     public static final Creator<Ingredient> CREATOR = new Creator<Ingredient>() {
@@ -33,18 +33,18 @@ public class Ingredient implements Parcelable {
         }
     };
 
-    @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_QUANTITY)
-    @SerializedName(RecipeContract.IngredientEntry.COLUMN_QUANTITY)
+    @ColumnInfo(name = RecipeDataContract.IngredientEntry.COLUMN_QUANTITY)
+    @SerializedName(RecipeDataContract.IngredientEntry.COLUMN_QUANTITY)
     @Expose
     private double quantity;
 
-    @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_MEASURE)
-    @SerializedName(RecipeContract.IngredientEntry.COLUMN_MEASURE)
+    @ColumnInfo(name = RecipeDataContract.IngredientEntry.COLUMN_MEASURE)
+    @SerializedName(RecipeDataContract.IngredientEntry.COLUMN_MEASURE)
     @Expose
     private String measure;
 
-    @ColumnInfo(name = RecipeContract.IngredientEntry.COLUMN_INGREDIENT)
-    @SerializedName(RecipeContract.IngredientEntry.COLUMN_INGREDIENT)
+    @ColumnInfo(name = RecipeDataContract.IngredientEntry.COLUMN_INGREDIENT)
+    @SerializedName(RecipeDataContract.IngredientEntry.COLUMN_INGREDIENT)
     @Expose
     private String ingredient;
 
@@ -52,10 +52,10 @@ public class Ingredient implements Parcelable {
     * Addition, not exist in JSON
     * */
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(index = true, name = RecipeContract.IngredientEntry.COLUMN_ID)
+    @ColumnInfo(index = true, name = RecipeDataContract.IngredientEntry.COLUMN_ID)
     private long id;
 
-    @ColumnInfo(index = true, name = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
+    @ColumnInfo(index = true, name = RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID)
     private long recipeId;
 
     public Ingredient() {

@@ -7,7 +7,7 @@ import android.arch.persistence.room.Update;
 import android.database.Cursor;
 
 import com.irfankhoirul.recipe.data.pojo.Step;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -17,7 +17,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface StepDao {
-    @Query("SELECT COUNT(*) FROM " + RecipeContract.StepEntry.TABLE_NAME)
+    @Query("SELECT COUNT(*) FROM " + RecipeDataContract.StepEntry.TABLE_NAME)
     int count();
 
     @Insert(onConflict = REPLACE)
@@ -26,15 +26,17 @@ public interface StepDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(Step[] steps);
 
-    @Query("SELECT * FROM " + RecipeContract.StepEntry.TABLE_NAME)
-    Cursor selectAll();
+    @Query("SELECT * FROM " + RecipeDataContract.StepEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.StepEntry.COLUMN_RECIPE_ID + " = :recipeId")
+    Cursor selectAll(long recipeId);
 
-    @Query("SELECT * FROM " + RecipeContract.StepEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.StepEntry.COLUMN_ID + " = :id")
-    Cursor selectById(long id);
+    @Query("SELECT * FROM " + RecipeDataContract.StepEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.StepEntry.COLUMN_ID + " = :stepId" + " AND "
+            + RecipeDataContract.StepEntry.COLUMN_RECIPE_ID + " = :recipeId")
+    Cursor selectById(long stepId, long recipeId);
 
-    @Query("DELETE FROM " + RecipeContract.StepEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.StepEntry.COLUMN_ID + " = :id")
+    @Query("DELETE FROM " + RecipeDataContract.StepEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.StepEntry.COLUMN_ID + " = :id")
     int deleteById(long id);
 
     @Update(onConflict = REPLACE)

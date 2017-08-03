@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 
 public interface LocalRecipeDataSource extends RecipeDataSource {
-    void getAll(LocalDataObserver<Cursor> cursorFavoriteDataObserver);
+    void getAll(LocalDataObserver<ArrayList<Recipe>> cursorFavoriteDataObserver);
 
     void getById(long id, LocalDataObserver<Cursor> cursorFavoriteDataObserver);
 

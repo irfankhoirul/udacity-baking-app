@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.modul.recipe_detail;
+package com.irfankhoirul.recipe.modul.step;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.

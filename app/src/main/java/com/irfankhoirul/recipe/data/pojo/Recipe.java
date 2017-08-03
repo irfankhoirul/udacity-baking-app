@@ -12,17 +12,17 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import java.util.List;
 
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeContract.RecipeEntry.COLUMN_DATE_ADDED;
+import static com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-@Entity(tableName = RecipeContract.RecipeEntry.TABLE_NAME)
+@Entity(tableName = RecipeDataContract.RecipeEntry.TABLE_NAME)
 public class Recipe implements Parcelable {
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
@@ -37,44 +37,44 @@ public class Recipe implements Parcelable {
         }
     };
     @PrimaryKey
-    @ColumnInfo(index = true, name = RecipeContract.RecipeEntry.COLUMN_ID)
-    @SerializedName(RecipeContract.RecipeEntry.COLUMN_ID)
+    @ColumnInfo(index = true, name = RecipeDataContract.RecipeEntry.COLUMN_ID)
+    @SerializedName(RecipeDataContract.RecipeEntry.COLUMN_ID)
     @Expose
     private long id;
 
-    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_NAME)
-    @SerializedName(RecipeContract.RecipeEntry.COLUMN_NAME)
+    @ColumnInfo(name = RecipeDataContract.RecipeEntry.COLUMN_NAME)
+    @SerializedName(RecipeDataContract.RecipeEntry.COLUMN_NAME)
     @Expose
     private String name;
 
-    //    @Relation(parentColumn = RecipeContract.RecipeEntry.COLUMN_ID,
-//            entityColumn = RecipeContract.IngredientEntry.COLUMN_RECIPE_ID)
+    //    @Relation(parentColumn = RecipeDataContract.RecipeEntry.COLUMN_ID,
+//            entityColumn = RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID)
     @Ignore
-    @SerializedName(RecipeContract.RecipeEntry.ENTITY_INGREDIENTS)
+    @SerializedName(RecipeDataContract.RecipeEntry.ENTITY_INGREDIENTS)
     @Expose
     private List<Ingredient> ingredients = null;
 
-    //    @Relation(parentColumn = RecipeContract.RecipeEntry.COLUMN_ID,
-//            entityColumn = RecipeContract.StepEntry.COLUMN_RECIPE_ID)
+    //    @Relation(parentColumn = RecipeDataContract.RecipeEntry.COLUMN_ID,
+//            entityColumn = RecipeDataContract.StepEntry.COLUMN_RECIPE_ID)
     @Ignore
-    @SerializedName(RecipeContract.RecipeEntry.ENTITY_STEPS)
+    @SerializedName(RecipeDataContract.RecipeEntry.ENTITY_STEPS)
     @Expose
     private List<Step> steps = null;
 
-    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_SERVINGS)
-    @SerializedName(RecipeContract.RecipeEntry.COLUMN_SERVINGS)
+    @ColumnInfo(name = RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)
+    @SerializedName(RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)
     @Expose
     private int servings;
 
-    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_IMAGE)
-    @SerializedName(RecipeContract.RecipeEntry.COLUMN_IMAGE)
+    @ColumnInfo(name = RecipeDataContract.RecipeEntry.COLUMN_IMAGE)
+    @SerializedName(RecipeDataContract.RecipeEntry.COLUMN_IMAGE)
     @Expose
     private String image;
 
     /*
     * Addition, not exist in JSON
     * */
-    @ColumnInfo(name = RecipeContract.RecipeEntry.COLUMN_FAVORITE)
+    @ColumnInfo(name = RecipeDataContract.RecipeEntry.COLUMN_FAVORITE)
     private boolean favorite;
 
     @ColumnInfo(name = COLUMN_DATE_ADDED)
@@ -96,35 +96,35 @@ public class Recipe implements Parcelable {
 
     public static Recipe fromContentValues(ContentValues values) {
         final Recipe recipe = new Recipe();
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_ID)) {
-            recipe.id = values.getAsLong(RecipeContract.RecipeEntry.COLUMN_ID);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_ID)) {
+            recipe.id = values.getAsLong(RecipeDataContract.RecipeEntry.COLUMN_ID);
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_NAME)) {
-            recipe.name = values.getAsString(RecipeContract.RecipeEntry.COLUMN_NAME);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_NAME)) {
+            recipe.name = values.getAsString(RecipeDataContract.RecipeEntry.COLUMN_NAME);
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.ENTITY_INGREDIENTS)) {
+        if (values.containsKey(RecipeDataContract.RecipeEntry.ENTITY_INGREDIENTS)) {
             recipe.ingredients = new Gson().fromJson(values.getAsString(
-                    RecipeContract.RecipeEntry.ENTITY_INGREDIENTS),
+                    RecipeDataContract.RecipeEntry.ENTITY_INGREDIENTS),
                     new TypeToken<List<Ingredient>>() {
                     }.getType());
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.ENTITY_STEPS)) {
+        if (values.containsKey(RecipeDataContract.RecipeEntry.ENTITY_STEPS)) {
             recipe.steps = new Gson().fromJson(values.getAsString(
-                    RecipeContract.RecipeEntry.ENTITY_STEPS),
+                    RecipeDataContract.RecipeEntry.ENTITY_STEPS),
                     new TypeToken<List<Step>>() {
                     }.getType());
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_SERVINGS)) {
-            recipe.servings = values.getAsInteger(RecipeContract.RecipeEntry.COLUMN_SERVINGS);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)) {
+            recipe.servings = values.getAsInteger(RecipeDataContract.RecipeEntry.COLUMN_SERVINGS);
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_IMAGE)) {
-            recipe.image = values.getAsString(RecipeContract.RecipeEntry.COLUMN_IMAGE);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_IMAGE)) {
+            recipe.image = values.getAsString(RecipeDataContract.RecipeEntry.COLUMN_IMAGE);
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_FAVORITE)) {
-            recipe.favorite = values.getAsBoolean(RecipeContract.RecipeEntry.COLUMN_FAVORITE);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_FAVORITE)) {
+            recipe.favorite = values.getAsBoolean(RecipeDataContract.RecipeEntry.COLUMN_FAVORITE);
         }
-        if (values.containsKey(RecipeContract.RecipeEntry.COLUMN_DATE_ADDED)) {
-            recipe.dateAdded = values.getAsLong(RecipeContract.RecipeEntry.COLUMN_DATE_ADDED);
+        if (values.containsKey(RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED)) {
+            recipe.dateAdded = values.getAsLong(RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED);
         }
 
         return recipe;

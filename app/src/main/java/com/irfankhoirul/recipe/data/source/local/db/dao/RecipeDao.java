@@ -7,7 +7,7 @@ import android.arch.persistence.room.Update;
 import android.database.Cursor;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -18,7 +18,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface RecipeDao {
 
-    @Query("SELECT COUNT(*) FROM " + RecipeContract.RecipeEntry.TABLE_NAME)
+    @Query("SELECT COUNT(*) FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME)
     int count();
 
     @Insert(onConflict = REPLACE)
@@ -27,45 +27,45 @@ public interface RecipeDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(Recipe[] recipes);
 
-    @Query("SELECT * FROM " + RecipeContract.RecipeEntry.TABLE_NAME)
+    @Query("SELECT * FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME)
     Cursor selectAll();
 
-    @Query("SELECT " + RecipeContract.RecipeEntry.TABLE_NAME + ".*, " +
-            RecipeContract.IngredientEntry.TABLE_NAME + ".*, " +
-            RecipeContract.StepEntry.TABLE_NAME + ".* " +
-            "FROM " + RecipeContract.RecipeEntry.TABLE_NAME + " " +
-            "INNER JOIN " + RecipeContract.IngredientEntry.TABLE_NAME + " ON " +
-            RecipeContract.IngredientEntry.TABLE_NAME + "." +
-            RecipeContract.IngredientEntry.COLUMN_RECIPE_ID + " = " +
-            RecipeContract.RecipeEntry.TABLE_NAME + "." + RecipeContract.RecipeEntry.COLUMN_ID + " " +
-            "INNER JOIN " + RecipeContract.StepEntry.TABLE_NAME + " ON " +
-            RecipeContract.StepEntry.TABLE_NAME + "." +
-            RecipeContract.StepEntry.COLUMN_RECIPE_ID + " = " +
-            RecipeContract.RecipeEntry.TABLE_NAME + "." + RecipeContract.RecipeEntry.COLUMN_ID)
+    @Query("SELECT " + RecipeDataContract.RecipeEntry.TABLE_NAME + ".*, " +
+            RecipeDataContract.IngredientEntry.TABLE_NAME + ".*, " +
+            RecipeDataContract.StepEntry.TABLE_NAME + ".* " +
+            "FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME + " " +
+            "INNER JOIN " + RecipeDataContract.IngredientEntry.TABLE_NAME + " ON " +
+            RecipeDataContract.IngredientEntry.TABLE_NAME + "." +
+            RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID + " = " +
+            RecipeDataContract.RecipeEntry.TABLE_NAME + "." + RecipeDataContract.RecipeEntry.COLUMN_ID + " " +
+            "INNER JOIN " + RecipeDataContract.StepEntry.TABLE_NAME + " ON " +
+            RecipeDataContract.StepEntry.TABLE_NAME + "." +
+            RecipeDataContract.StepEntry.COLUMN_RECIPE_ID + " = " +
+            RecipeDataContract.RecipeEntry.TABLE_NAME + "." + RecipeDataContract.RecipeEntry.COLUMN_ID)
     Cursor selectAllWithChildElements();
 
-    @Query("SELECT * FROM " + RecipeContract.RecipeEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.RecipeEntry.COLUMN_ID + " = :id")
+    @Query("SELECT * FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.RecipeEntry.COLUMN_ID + " = :id")
     Cursor selectById(long id);
 
-    @Query("SELECT " + RecipeContract.RecipeEntry.TABLE_NAME + ".*, " +
-            RecipeContract.IngredientEntry.TABLE_NAME + ".*, " +
-            RecipeContract.StepEntry.TABLE_NAME + ".* " +
-            "FROM " + RecipeContract.RecipeEntry.TABLE_NAME + " " +
-            "INNER JOIN " + RecipeContract.IngredientEntry.TABLE_NAME + " ON " +
-            RecipeContract.IngredientEntry.TABLE_NAME + "." +
-            RecipeContract.IngredientEntry.COLUMN_RECIPE_ID + " = " +
-            RecipeContract.RecipeEntry.TABLE_NAME + "." + RecipeContract.RecipeEntry.COLUMN_ID + " " +
-            "INNER JOIN " + RecipeContract.StepEntry.TABLE_NAME + " ON " +
-            RecipeContract.StepEntry.TABLE_NAME + "." +
-            RecipeContract.StepEntry.COLUMN_RECIPE_ID + " = " +
-            RecipeContract.RecipeEntry.TABLE_NAME + "." + RecipeContract.RecipeEntry.COLUMN_ID +
-            " WHERE " + RecipeContract.RecipeEntry.TABLE_NAME + "." +
-            RecipeContract.RecipeEntry.COLUMN_ID + " = :id")
+    @Query("SELECT " + RecipeDataContract.RecipeEntry.TABLE_NAME + ".*, " +
+            RecipeDataContract.IngredientEntry.TABLE_NAME + ".*, " +
+            RecipeDataContract.StepEntry.TABLE_NAME + ".* " +
+            "FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME + " " +
+            "INNER JOIN " + RecipeDataContract.IngredientEntry.TABLE_NAME + " ON " +
+            RecipeDataContract.IngredientEntry.TABLE_NAME + "." +
+            RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID + " = " +
+            RecipeDataContract.RecipeEntry.TABLE_NAME + "." + RecipeDataContract.RecipeEntry.COLUMN_ID + " " +
+            "INNER JOIN " + RecipeDataContract.StepEntry.TABLE_NAME + " ON " +
+            RecipeDataContract.StepEntry.TABLE_NAME + "." +
+            RecipeDataContract.StepEntry.COLUMN_RECIPE_ID + " = " +
+            RecipeDataContract.RecipeEntry.TABLE_NAME + "." + RecipeDataContract.RecipeEntry.COLUMN_ID +
+            " WHERE " + RecipeDataContract.RecipeEntry.TABLE_NAME + "." +
+            RecipeDataContract.RecipeEntry.COLUMN_ID + " = :id")
     Cursor selectByIdWithChildElements(long id);
 
-    @Query("DELETE FROM " + RecipeContract.RecipeEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.RecipeEntry.COLUMN_ID + " = :id")
+    @Query("DELETE FROM " + RecipeDataContract.RecipeEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.RecipeEntry.COLUMN_ID + " = :id")
     int deleteById(long id);
 
     @Update(onConflict = REPLACE)

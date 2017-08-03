@@ -13,7 +13,6 @@ import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.util.GlideApp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,10 +23,10 @@ import butterknife.ButterKnife;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
 
-    private List<Recipe> recipes = new ArrayList<>();
+    private ArrayList<Recipe> recipes = new ArrayList<>();
     private RecipeClickListener clickListener;
 
-    public RecipeAdapter(List<Recipe> recipes, RecipeClickListener clickListener) {
+    public RecipeAdapter(ArrayList<Recipe> recipes, RecipeClickListener clickListener) {
         this.recipes = recipes;
         this.clickListener = clickListener;
     }

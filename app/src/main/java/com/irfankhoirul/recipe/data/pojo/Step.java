@@ -9,16 +9,16 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-@Entity(tableName = RecipeContract.StepEntry.TABLE_NAME,
+@Entity(tableName = RecipeDataContract.StepEntry.TABLE_NAME,
         foreignKeys = @ForeignKey(entity = Recipe.class,
-                parentColumns = RecipeContract.RecipeEntry.COLUMN_ID,
-                childColumns = RecipeContract.StepEntry.COLUMN_RECIPE_ID))
+                parentColumns = RecipeDataContract.RecipeEntry.COLUMN_ID,
+                childColumns = RecipeDataContract.StepEntry.COLUMN_RECIPE_ID))
 public class Step implements Parcelable {
 
     public static final Creator<Step> CREATOR = new Creator<Step>() {
@@ -34,35 +34,35 @@ public class Step implements Parcelable {
     };
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(index = true, name = RecipeContract.StepEntry.COLUMN_ID)
-    @SerializedName(RecipeContract.StepEntry.COLUMN_ID)
+    @ColumnInfo(index = true, name = RecipeDataContract.StepEntry.COLUMN_ID)
+    @SerializedName(RecipeDataContract.StepEntry.COLUMN_ID)
     @Expose
     private long id;
 
-    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
-    @SerializedName(RecipeContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
+    @ColumnInfo(name = RecipeDataContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
+    @SerializedName(RecipeDataContract.StepEntry.COLUMN_SHORT_DESCRIPTION)
     @Expose
     private String shortDescription;
 
-    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_DESCRIPTION)
-    @SerializedName(RecipeContract.StepEntry.COLUMN_DESCRIPTION)
+    @ColumnInfo(name = RecipeDataContract.StepEntry.COLUMN_DESCRIPTION)
+    @SerializedName(RecipeDataContract.StepEntry.COLUMN_DESCRIPTION)
     @Expose
     private String description;
 
-    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_VIDEO_URL)
-    @SerializedName(RecipeContract.StepEntry.COLUMN_VIDEO_URL)
+    @ColumnInfo(name = RecipeDataContract.StepEntry.COLUMN_VIDEO_URL)
+    @SerializedName(RecipeDataContract.StepEntry.COLUMN_VIDEO_URL)
     @Expose
     private String videoURL;
 
-    @ColumnInfo(name = RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
-    @SerializedName(RecipeContract.StepEntry.COLUMN_THUMBNAIL_URL)
+    @ColumnInfo(name = RecipeDataContract.StepEntry.COLUMN_THUMBNAIL_URL)
+    @SerializedName(RecipeDataContract.StepEntry.COLUMN_THUMBNAIL_URL)
     @Expose
     private String thumbnailURL;
 
     /*
     * Addition, not exist in JSON
     * */
-    @ColumnInfo(index = true, name = RecipeContract.StepEntry.COLUMN_RECIPE_ID)
+    @ColumnInfo(index = true, name = RecipeDataContract.StepEntry.COLUMN_RECIPE_ID)
     private long recipeId;
 
     public Step() {

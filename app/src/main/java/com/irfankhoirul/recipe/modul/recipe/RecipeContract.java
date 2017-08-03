@@ -10,10 +10,8 @@ import java.util.ArrayList;
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-public interface RecipeListContract {
+public interface RecipeContract {
     interface View {
-        void updateRecipeList(ArrayList<Recipe> recipes);
-
         void setLoading(boolean status, @Nullable String message);
 
         void showError(String message);

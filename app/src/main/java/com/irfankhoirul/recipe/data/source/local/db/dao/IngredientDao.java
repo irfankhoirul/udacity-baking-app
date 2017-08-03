@@ -7,7 +7,7 @@ import android.arch.persistence.room.Update;
 import android.database.Cursor;
 
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -17,7 +17,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface IngredientDao {
-    @Query("SELECT COUNT(*) FROM " + RecipeContract.IngredientEntry.TABLE_NAME)
+    @Query("SELECT COUNT(*) FROM " + RecipeDataContract.IngredientEntry.TABLE_NAME)
     int count();
 
     @Insert(onConflict = REPLACE)
@@ -26,15 +26,17 @@ public interface IngredientDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(Ingredient[] ingredients);
 
-    @Query("SELECT * FROM " + RecipeContract.IngredientEntry.TABLE_NAME)
-    Cursor selectAll();
+    @Query("SELECT * FROM " + RecipeDataContract.IngredientEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID + " = :recipeId")
+    Cursor selectAll(long recipeId);
 
-    @Query("SELECT * FROM " + RecipeContract.IngredientEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.IngredientEntry.COLUMN_ID + " = :id")
-    Cursor selectById(long id);
+    @Query("SELECT * FROM " + RecipeDataContract.IngredientEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.IngredientEntry.COLUMN_ID + " = :ingredientId" + " AND "
+            + RecipeDataContract.IngredientEntry.COLUMN_RECIPE_ID + " = :recipeId")
+    Cursor selectById(long ingredientId, long recipeId);
 
-    @Query("DELETE FROM " + RecipeContract.IngredientEntry.TABLE_NAME + " WHERE "
-            + RecipeContract.IngredientEntry.COLUMN_ID + " = :id")
+    @Query("DELETE FROM " + RecipeDataContract.IngredientEntry.TABLE_NAME + " WHERE "
+            + RecipeDataContract.IngredientEntry.COLUMN_ID + " = :id")
     int deleteById(long id);
 
     @Update(onConflict = REPLACE)

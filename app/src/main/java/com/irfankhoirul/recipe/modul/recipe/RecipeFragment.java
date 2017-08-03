@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +27,14 @@ import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.util.DisplayMetricUtils;
 import com.irfankhoirul.recipe.util.RecyclerViewMarginDecoration;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecipeListFragment extends LifecycleFragment
-        implements RecipeListContract.View, RecipeAdapter.RecipeClickListener {
+public class RecipeFragment extends LifecycleFragment
+        implements RecipeContract.View, RecipeAdapter.RecipeClickListener {
 
     private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 100;
 
@@ -46,10 +45,10 @@ public class RecipeListFragment extends LifecycleFragment
     @BindView(R.id.tv_loading_message)
     TextView tvLoadingMessage;
 
-    private RecipeListViewModel mViewModel;
+    private RecipeViewModel mViewModel;
     private RecipeAdapter recipeAdapter;
 
-    public RecipeListFragment() {
+    public RecipeFragment() {
         // Required empty public constructor
     }
 
@@ -66,40 +65,22 @@ public class RecipeListFragment extends LifecycleFragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        RecipeListViewModel.Factory factory = new RecipeListViewModel.Factory(
+        RecipeViewModel.Factory factory = new RecipeViewModel.Factory(
                 getActivity().getApplication(), this);
 
         mViewModel = ViewModelProviders.of(this, factory)
-                .get(RecipeListViewModel.class);
+                .get(RecipeViewModel.class);
 
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                showPermissionDialog();
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        WRITE_STORAGE_PERMISSION_REQUEST_CODE);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+            showPermissionDialog();
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            showPermissionDialog();
+        } else {
+            mViewModel.loadRecipes(0);
         }
-
-        mViewModel.loadRecipes(0);
 
         setupRecyclerView();
     }
@@ -122,21 +103,18 @@ public class RecipeListFragment extends LifecycleFragment
 //        rvRecipes.getItemAnimator().setChangeDuration(0);
     }
 
-    @Override
-    public void updateRecipeList(ArrayList<Recipe> recipes) {
-
-    }
-
     private void showPermissionDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_permission, null);
         dialogBuilder.setView(dialogView);
-//        dialogBuilder.setTitle(R.string.dialog_title_sort);
+        dialogBuilder.setTitle("Storage Access Permission");
 
         dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        WRITE_STORAGE_PERMISSION_REQUEST_CODE);
             }
         });
         AlertDialog permissionDialog = dialogBuilder.create();
@@ -185,6 +163,7 @@ public class RecipeListFragment extends LifecycleFragment
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
+        Log.v("RequestPermissionResult", "Called!");
         switch (requestCode) {
             case WRITE_STORAGE_PERMISSION_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.

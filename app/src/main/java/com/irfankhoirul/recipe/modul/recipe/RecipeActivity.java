@@ -7,7 +7,7 @@ import com.irfankhoirul.recipe.R;
 
 import butterknife.ButterKnife;
 
-public class RecipeListActivity extends AppCompatActivity {
+public class RecipeActivity extends AppCompatActivity {
 
 
     @Override
@@ -18,7 +18,7 @@ public class RecipeListActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fl_container, new RecipeListFragment())
+                    .replace(R.id.fl_container, new RecipeFragment())
                     .commit();
         }
     }

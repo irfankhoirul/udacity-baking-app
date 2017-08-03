@@ -5,4 +5,36 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <plurals name="plural_unit_gram">
+        <item quantity="one">Gram</item>
+        <item quantity="other">Grams</item>
+    </plurals>
+
+    <plurals name="plural_unit_kilo_grams">
+        <item quantity="one">Kg</item>
+        <item quantity="other">Kilorams</item>
+    </plurals>
+
+    <plurals name="plural_unit_cup">
+        <item quantity="one">Cup</item>
+        <item quantity="other">Cups</item>
+    </plurals>
+
+    <plurals name="plural_unit_tablespoon">
+        <item quantity="one">Tablespoon</item>
+        <item quantity="other">Tablespoons</item>
+    </plurals>
+
+    <plurals name="plural_unit_teaspoon">
+        <item quantity="one">Teaspoon</item>
+        <item quantity="other">Teaspoons</item>
+    </plurals>
+
+    <plurals name="plural_unit_ounce">
+        <item quantity="one">Oz</item>
+        <item quantity="other">Oz</item>
+    </plurals>
+
 </resources>

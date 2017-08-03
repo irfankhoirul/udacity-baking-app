@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
  * Created by Irfan Khoirul on 7/25/2017.
  */
 
-public class RecipeContract {
+public class RecipeDataContract {
 
     public static final String AUTHORITY = "com.irfankhoirul.recipe";
 
@@ -45,10 +45,14 @@ public class RecipeContract {
         public static final int CODE_INGREDIENT_DIRECTORY = 200;
         public static final int CODE_INGREDIENT_ITEM = 201;
 
-        public static final Uri INGREDIENT_CONTENT_URI =
+        public static final Uri INGREDIENT_CONTENT_DIRECTORY_URI =
                 BASE_CONTENT_URI.buildUpon()
                         .appendPath(TABLE_NAME)
                         .build();
+
+        public static final Uri.Builder INGREDIENT_CONTENT_ITEM_URI =
+                BASE_CONTENT_URI.buildUpon()
+                        .appendPath(TABLE_NAME);
     }
 
     public static final class StepEntry implements BaseColumns {
@@ -67,6 +71,10 @@ public class RecipeContract {
                 BASE_CONTENT_URI.buildUpon()
                         .appendPath(TABLE_NAME)
                         .build();
+
+        public static final Uri.Builder STEP_CONTENT_ITEM_URI =
+                BASE_CONTENT_URI.buildUpon()
+                        .appendPath(TABLE_NAME);
     }
 
 }
