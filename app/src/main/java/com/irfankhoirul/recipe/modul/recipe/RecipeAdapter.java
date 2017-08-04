@@ -1,6 +1,9 @@
 package com.irfankhoirul.recipe.modul.recipe;
 
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import android.widget.TextView;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
+import com.irfankhoirul.recipe.util.DisplayMetricUtils;
 import com.irfankhoirul.recipe.util.GlideApp;
 
 import java.util.ArrayList;
@@ -25,10 +29,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     private ArrayList<Recipe> recipes = new ArrayList<>();
     private RecipeClickListener clickListener;
+    private int cardHeightInDp;
+    private int cardWidthInDp;
 
-    public RecipeAdapter(ArrayList<Recipe> recipes, RecipeClickListener clickListener) {
+    public RecipeAdapter(ArrayList<Recipe> recipes, int cardWidth, int cardHeight, RecipeClickListener clickListener) {
         this.recipes = recipes;
         this.clickListener = clickListener;
+        this.cardHeightInDp = cardHeight;
+        this.cardWidthInDp = cardWidth;
     }
 
     @Override
@@ -53,6 +61,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         setImageThumbnail(holder, recipe.getImage());
 
+        setCardViewSize(holder);
+
+    }
+
+    private void setCardViewSize(RecipeViewHolder holder) {
+        ViewGroup.LayoutParams layoutParams =
+                holder.cvRecipe.getLayoutParams();
+        layoutParams.width = DisplayMetricUtils.convertDpToPixel(cardWidthInDp);
+        layoutParams.height = DisplayMetricUtils.convertDpToPixel(cardHeightInDp);
+        holder.cvRecipe.setLayoutParams(layoutParams);
+
+        Log.v("layoutParams.width", String.valueOf(layoutParams.width));
+        Log.v("layoutParams.height", String.valueOf(layoutParams.height));
     }
 
     private void setImageThumbnail(RecipeViewHolder holder, String url) {
@@ -81,6 +102,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        @BindView(R.id.cv_recipe)
+        CardView cvRecipe;
+        @BindView(R.id.cl_recipe_container)
+        ConstraintLayout clRecipeContainer;
         @BindView(R.id.iv_thumbnail)
         ImageView ivThumbnail;
         @BindView(R.id.v_footer)
@@ -93,7 +118,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         RecipeViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+
+            ivThumbnail.setOnClickListener(this);
 
             ivFavorite.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -101,10 +127,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     clickListener.onFavoriteClick(recipes.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
+
         }
 
         @Override
         public void onClick(View v) {
+            Log.v("ConstraintLayout", "Clicked!");
             clickListener.onRecipeItemClick(recipes.get(getAdapterPosition()));
         }
     }

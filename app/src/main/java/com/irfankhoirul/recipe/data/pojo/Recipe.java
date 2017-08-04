@@ -14,6 +14,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED;
@@ -52,14 +53,14 @@ public class Recipe implements Parcelable {
     @Ignore
     @SerializedName(RecipeDataContract.RecipeEntry.ENTITY_INGREDIENTS)
     @Expose
-    private List<Ingredient> ingredients = null;
+    private ArrayList<Ingredient> ingredients = null;
 
     //    @Relation(parentColumn = RecipeDataContract.RecipeEntry.COLUMN_ID,
 //            entityColumn = RecipeDataContract.StepEntry.COLUMN_RECIPE_ID)
     @Ignore
     @SerializedName(RecipeDataContract.RecipeEntry.ENTITY_STEPS)
     @Expose
-    private List<Step> steps = null;
+    private ArrayList<Step> steps = null;
 
     @ColumnInfo(name = RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)
     @SerializedName(RecipeDataContract.RecipeEntry.COLUMN_SERVINGS)
@@ -146,19 +147,19 @@ public class Recipe implements Parcelable {
         this.name = name;
     }
 
-    public List<Ingredient> getIngredients() {
+    public ArrayList<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(ArrayList<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 
-    public List<Step> getSteps() {
+    public ArrayList<Step> getSteps() {
         return steps;
     }
 
-    public void setSteps(List<Step> steps) {
+    public void setSteps(ArrayList<Step> steps) {
         this.steps = steps;
     }
 

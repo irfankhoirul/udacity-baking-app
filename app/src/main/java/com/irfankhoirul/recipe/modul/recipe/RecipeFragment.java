@@ -5,6 +5,7 @@ import android.Manifest;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
+import com.irfankhoirul.recipe.modul.recipe_detail.RecipeDetailActivity;
 import com.irfankhoirul.recipe.util.DisplayMetricUtils;
 import com.irfankhoirul.recipe.util.RecyclerViewMarginDecoration;
 
@@ -55,7 +57,6 @@ public class RecipeFragment extends LifecycleFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         ButterKnife.bind(this, view);
 
@@ -86,11 +87,21 @@ public class RecipeFragment extends LifecycleFragment
     }
 
     private void setupRecyclerView() {
+        int marginInDp = 8;
         int marginInPixel = DisplayMetricUtils.convertDpToPixel(8);
         int deviceWidthInDp = DisplayMetricUtils.convertPixelsToDp(
                 DisplayMetricUtils.getDeviceWidth(getActivity()));
 
         int column = deviceWidthInDp / 300;
+        int totalMarginInDp = marginInDp * (column + 1);
+        int cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column; //Salah
+        int cardHeightInDp = (int) (2.0f / 3.0f * cardWidthInDp);
+
+        Log.v("Column", String.valueOf(column));
+        Log.v("deviceWidthInDp", String.valueOf(deviceWidthInDp));
+        Log.v("totalMarginInDp", String.valueOf(totalMarginInDp));
+        Log.v("cardWidthInDp", String.valueOf(cardWidthInDp));
+        Log.v("cardHeightInDp", String.valueOf(cardHeightInDp));
 
         RecyclerViewMarginDecoration decoration =
                 new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
@@ -98,7 +109,7 @@ public class RecipeFragment extends LifecycleFragment
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), column);
         rvRecipes.setLayoutManager(layoutManager);
         rvRecipes.addItemDecoration(decoration);
-        recipeAdapter = new RecipeAdapter(mViewModel.getLoadedRecipes(), this);
+        recipeAdapter = new RecipeAdapter(mViewModel.getLoadedRecipes(), cardWidthInDp, cardHeightInDp, this);
         rvRecipes.setAdapter(recipeAdapter);
 //        rvRecipes.getItemAnimator().setChangeDuration(0);
     }
@@ -145,8 +156,10 @@ public class RecipeFragment extends LifecycleFragment
     }
 
     @Override
-    public void onRecipeItemClick(Recipe review) {
-
+    public void onRecipeItemClick(Recipe recipe) {
+        Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+        intent.putExtra("recipe", recipe);
+        startActivity(intent);
     }
 
     @Override
@@ -163,27 +176,14 @@ public class RecipeFragment extends LifecycleFragment
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        Log.v("RequestPermissionResult", "Called!");
         switch (requestCode) {
             case WRITE_STORAGE_PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mViewModel.loadRecipes(0);
-
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     showError("Permission not granted");
                 }
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }
