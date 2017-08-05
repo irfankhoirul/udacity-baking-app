@@ -73,7 +73,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            llStep.setOnClickListener(this);
+            tvStepShortDescription.setOnClickListener(this);
         }
 
         @Override

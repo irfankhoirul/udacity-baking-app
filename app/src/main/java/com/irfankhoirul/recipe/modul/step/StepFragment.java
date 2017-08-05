@@ -1,6 +1,8 @@
 package com.irfankhoirul.recipe.modul.step;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Step;
+import com.irfankhoirul.recipe.modul.step_detail.StepDetailActivity;
 
 import java.util.ArrayList;
 
@@ -26,18 +29,34 @@ public class StepFragment extends Fragment implements StepAdapter.StepClickListe
     RecyclerView rvStep;
 
     private StepAdapter stepAdapter;
+    private ArrayList<Step> steps = new ArrayList<>();
+    private boolean isTablet;
+    private StepFragmentListener fragmentListener;
 
     public StepFragment() {
         // Required empty public constructor
     }
 
-    public static StepFragment newInstance(ArrayList<Step> steps) {
+    public static StepFragment newInstance(ArrayList<Step> steps, boolean isTablet) {
         StepFragment stepFragment = new StepFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("steps", steps);
+        bundle.putBoolean("isTablet", isTablet);
         stepFragment.setArguments(bundle);
 
         return stepFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        fragmentListener = (StepFragmentListener) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        fragmentListener = null;
     }
 
     @Override
@@ -47,28 +66,35 @@ public class StepFragment extends Fragment implements StepAdapter.StepClickListe
         View view = inflater.inflate(R.layout.fragment_step_list, container, false);
         ButterKnife.bind(this, view);
 
+        if (getArguments() != null) {
+            steps = getArguments().getParcelableArrayList("steps");
+            isTablet = getArguments().getBoolean("isTablet");
+        }
         setupRecyclerView();
 
         return view;
     }
 
     private void setupRecyclerView() {
-//        int column = 1;
-//        int marginInPixel = DisplayMetricUtils.convertDpToPixel(8);
-
-//        RecyclerViewMarginDecoration decoration =
-//                new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
-//                        marginInPixel, column);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rvStep.setLayoutManager(layoutManager);
-//        rvStep.addItemDecoration(decoration);
-        ArrayList<Step> steps = getArguments().getParcelableArrayList("steps");
         stepAdapter = new StepAdapter(steps, this);
         rvStep.setAdapter(stepAdapter);
     }
 
     @Override
     public void onStepItemClick(Step step) {
+        if (isTablet) {
+            fragmentListener.onStepClicked(step);
+        } else {
+            Intent intent = new Intent(getActivity(), StepDetailActivity.class);
+            intent.putParcelableArrayListExtra("steps", steps);
+            intent.putExtra("currentStepIndex", steps.indexOf(step));
+            startActivity(intent);
+        }
+    }
 
+    public interface StepFragmentListener {
+        void onStepClicked(Step step);
     }
 }

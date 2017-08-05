@@ -6,19 +6,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
+import com.irfankhoirul.recipe.data.pojo.Step;
 import com.irfankhoirul.recipe.modul.ingredient.IngredientFragment;
 import com.irfankhoirul.recipe.modul.step.StepFragment;
-import com.irfankhoirul.recipe.util.DisplayMetricUtils;
+import com.irfankhoirul.recipe.modul.step_detail.StepDetailFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeDetailActivity extends AppCompatActivity {
+public class RecipeDetailActivity extends AppCompatActivity implements StepFragment.StepFragmentListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -42,8 +42,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         setupToolbar();
 
-//        flDetailStepContainer = (FrameLayout) findViewById(R.id.fl_detail_step_container);
-//        isTablet = flDetailStepContainer != null;
+        flDetailStepContainer = (FrameLayout) findViewById(R.id.fl_detail_step_container);
+        isTablet = flDetailStepContainer != null;
 
         setupFragment(savedInstanceState);
 
@@ -61,18 +61,18 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
     private void setupFragment(Bundle savedInstanceState) {
 
-        if (isTablet) {
-            ViewGroup.LayoutParams ivTrailerThumbnailLayoutParams = tabLayout.getLayoutParams();
-            ivTrailerThumbnailLayoutParams.width = (int) (DisplayMetricUtils.getDeviceWidth(this) * 1.0f / 3.0f);
-//            ivTrailerThumbnailLayoutParams.height = itemHeight;
-            tabLayout.setLayoutParams(ivTrailerThumbnailLayoutParams);
-        }
+//        if (isTablet) {
+//            ViewGroup.LayoutParams ivTrailerThumbnailLayoutParams = tabLayout.getLayoutParams();
+//            ivTrailerThumbnailLayoutParams.width = (int) (DisplayMetricUtils.getDeviceWidth(this) * 1.0f / 3.0f);
+////            ivTrailerThumbnailLayoutParams.height = itemHeight;
+//            tabLayout.setLayoutParams(ivTrailerThumbnailLayoutParams);
+//        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
             Recipe recipe = getIntent().getParcelableExtra("recipe");
             ingredientFragment = IngredientFragment.newInstance(recipe.getIngredients());
-            stepFragment = StepFragment.newInstance(recipe.getSteps());
+            stepFragment = StepFragment.newInstance(recipe.getSteps(), isTablet);
         } else {
             ingredientFragment = (IngredientFragment) fragmentManager.getFragment(savedInstanceState, "ingredientFragment");
             stepFragment = (StepFragment) fragmentManager.getFragment(savedInstanceState, "stepFragment");
@@ -84,5 +84,16 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 stepFragment);
         viewPager.setAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    private void showDetailStepFragment(Step step) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_detail_step_container, StepDetailFragment.newInstance(step))
+                .commit();
+    }
+
+    @Override
+    public void onStepClicked(Step step) {
+        showDetailStepFragment(step);
     }
 }
