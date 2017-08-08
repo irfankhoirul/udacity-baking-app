@@ -112,7 +112,7 @@ public class StepDetailActivity extends AppCompatActivity {
             fragment = (StepDetailFragment) getSupportFragmentManager()
                     .getFragment(savedInstanceState, "stepDetailFragment");
         } else {
-            fragment = StepDetailFragment.newInstance(steps.get(stepIndex));
+            fragment = StepDetailFragment.newInstance(steps.get(stepIndex), false);
         }
 
         getSupportFragmentManager().beginTransaction()

@@ -47,6 +47,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @BindView(R.id.pb_buffering)
     ProgressBar pbBuffering;
     private Step step;
+    private boolean isTablet;
     private SimpleExoPlayer mExoPlayer;
     private PlaybackStateCompat.Builder mStateBuilder;
 
@@ -54,10 +55,11 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         // Required empty public constructor
     }
 
-    public static StepDetailFragment newInstance(Step step) {
+    public static StepDetailFragment newInstance(Step step, boolean isTablet) {
         StepDetailFragment stepDetailFragment = new StepDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable("step", step);
+        bundle.putBoolean("isTablet", isTablet);
         stepDetailFragment.setArguments(bundle);
 
         return stepDetailFragment;
@@ -77,24 +79,35 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
         if (getArguments() != null) {
             step = getArguments().getParcelable("step");
+            isTablet = getArguments().getBoolean("isTablet");
             if (step != null) {
                 tvStepDescription.setText(step.getDescription());
                 if ((step.getVideoURL() == null || step.getVideoURL().isEmpty()) &&
                         (step.getThumbnailURL() == null || step.getThumbnailURL().isEmpty())) {
                     videoPlayerView.setVisibility(View.GONE);
                 } else {
-                    if (DisplayMetricUtils.getDeviceOrientation(getActivity()) ==
-                            Configuration.ORIENTATION_LANDSCAPE) {
-                        ViewGroup.LayoutParams layoutParams =
-                                videoPlayerView.getLayoutParams();
-                        layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
-                        layoutParams.height = DisplayMetricUtils.getDeviceHeight(getActivity());
-                        videoPlayerView.setLayoutParams(layoutParams);
-                        tvStepDescription.setVisibility(View.GONE);
+                    if (!isTablet) {
+                        // Set fullscreen
+                        if (DisplayMetricUtils.getDeviceOrientation(getActivity()) ==
+                                Configuration.ORIENTATION_LANDSCAPE) {
+                            ViewGroup.LayoutParams layoutParams =
+                                    videoPlayerView.getLayoutParams();
+                            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
+                            layoutParams.height = DisplayMetricUtils.getDeviceHeight(getActivity());
+                            videoPlayerView.setLayoutParams(layoutParams);
+                            tvStepDescription.setVisibility(View.GONE);
+                        } else {
+                            ViewGroup.LayoutParams layoutParams =
+                                    videoPlayerView.getLayoutParams();
+                            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
+                            layoutParams.height = (int) (9.0f / 16.0f * layoutParams.width);
+                            videoPlayerView.setLayoutParams(layoutParams);
+                        }
                     } else {
                         ViewGroup.LayoutParams layoutParams =
                                 videoPlayerView.getLayoutParams();
-                        layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
+                        layoutParams.width = (int) (2.0f / 3.0f *
+                                DisplayMetricUtils.getDeviceWidth(getActivity()));
                         layoutParams.height = (int) (9.0f / 16.0f * layoutParams.width);
                         videoPlayerView.setLayoutParams(layoutParams);
                     }
