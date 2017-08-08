@@ -30,6 +30,7 @@ public class StepFragment extends Fragment implements StepAdapter.StepClickListe
 
     private StepAdapter stepAdapter;
     private ArrayList<Step> steps = new ArrayList<>();
+    private int currentStepIndex;
     private boolean isTablet;
     private StepFragmentListener fragmentListener;
 
@@ -84,12 +85,13 @@ public class StepFragment extends Fragment implements StepAdapter.StepClickListe
 
     @Override
     public void onStepItemClick(Step step) {
+        currentStepIndex = steps.indexOf(step);
         if (isTablet) {
             fragmentListener.onStepClicked(step);
         } else {
             Intent intent = new Intent(getActivity(), StepDetailActivity.class);
             intent.putParcelableArrayListExtra("steps", steps);
-            intent.putExtra("currentStepIndex", steps.indexOf(step));
+            intent.putExtra("currentStepIndex", currentStepIndex);
             startActivity(intent);
         }
     }

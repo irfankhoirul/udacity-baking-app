@@ -47,4 +47,8 @@ public final class DisplayMetricUtils {
         return displaymetrics.heightPixels;
     }
 
+    public static int getDeviceOrientation(Context context) {
+        return context.getResources().getConfiguration().orientation;
+    }
+
 }

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
@@ -109,12 +108,10 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
                 for (int j = stepCount - 1; j >= 0; j--) {
                     if (recipe.getSteps().get(j).getThumbnailURL() != null &&
                             !recipe.getSteps().get(j).getThumbnailURL().isEmpty()) {
-                        Log.v("Thumbnail:" + i, "FromVideoThumbnail");
                         recipe.setImage(recipe.getSteps().get(j).getThumbnailURL());
                         break;
                     } else if (recipe.getSteps().get(j).getVideoURL() != null &&
                             !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
-                        Log.v("Thumbnail:" + i, "FromVideoFrame");
                         String[] params = new String[2];
                         params[0] = recipe.getSteps().get(j).getVideoURL(); // url
                         params[1] = String.valueOf(i); // position
@@ -134,6 +131,11 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
     @Override
     public ArrayList<Recipe> getLoadedRecipes() {
         return recipes;
+    }
+
+    @Override
+    public void setFavoriteRecipe(Recipe recipe, int position) {
+        localRecipeDataSource.update(recipes.get(position), new LocalDataObserver<Integer>());
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

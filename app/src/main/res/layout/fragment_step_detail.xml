@@ -5,20 +5,25 @@
     android:orientation="vertical"
     tools:context="com.irfankhoirul.recipe.modul.step.StepDetailFragment">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-        android:id="@+id/video_player_view"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/horizontalHalf"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:background="@color/pure_black">
+
+        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            android:id="@+id/video_player_view"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_gravity="center" />
+
+        <ProgressBar
+            android:id="@+id/pb_buffering"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"

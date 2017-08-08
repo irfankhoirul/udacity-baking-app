@@ -71,9 +71,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         layoutParams.width = DisplayMetricUtils.convertDpToPixel(cardWidthInDp);
         layoutParams.height = DisplayMetricUtils.convertDpToPixel(cardHeightInDp);
         holder.cvRecipe.setLayoutParams(layoutParams);
-
-        Log.v("layoutParams.width", String.valueOf(layoutParams.width));
-        Log.v("layoutParams.height", String.valueOf(layoutParams.height));
     }
 
     private void setImageThumbnail(RecipeViewHolder holder, String url) {

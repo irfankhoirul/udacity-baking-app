@@ -1,7 +1,6 @@
 package com.irfankhoirul.recipe.modul.step;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,12 +40,15 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     @Override
     public void onBindViewHolder(StepViewHolder holder, int position) {
         Step item = steps.get(position);
-        if (position < getItemCount() - 1) {
-            holder.vStepConnector.setVisibility(View.VISIBLE);
-            Log.v("StepConnector", "Visible");
-        } else {
-            holder.vStepConnector.setVisibility(View.INVISIBLE);
-            Log.v("StepConnector", "Invisible");
+        if (position == 0) {
+            holder.vStepConnectorTop.setVisibility(View.INVISIBLE);
+            holder.vStepConnectorBottom.setVisibility(View.VISIBLE);
+        } else if (position < getItemCount() - 1) {
+            holder.vStepConnectorTop.setVisibility(View.VISIBLE);
+            holder.vStepConnectorBottom.setVisibility(View.VISIBLE);
+        } else { // Last
+            holder.vStepConnectorTop.setVisibility(View.VISIBLE);
+            holder.vStepConnectorBottom.setVisibility(View.INVISIBLE);
         }
         holder.tvStepShortDescription.setText(item.getShortDescription());
     }
@@ -66,8 +68,10 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
         LinearLayout llStep;
         @BindView(R.id.tv_step_short_description)
         TextView tvStepShortDescription;
-        @BindView(R.id.v_step_connector)
-        View vStepConnector;
+        @BindView(R.id.v_step_connector_top)
+        View vStepConnectorTop;
+        @BindView(R.id.v_step_connector_bottom)
+        View vStepConnectorBottom;
 
         StepViewHolder(View itemView) {
             super(itemView);

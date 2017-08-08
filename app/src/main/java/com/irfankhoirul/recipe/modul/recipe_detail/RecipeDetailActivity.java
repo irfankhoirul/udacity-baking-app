@@ -29,7 +29,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
     FrameLayout flDetailStepContainer;
 
     private RecipeDetailViewPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
     private IngredientFragment ingredientFragment;
     private StepFragment stepFragment;
     private boolean isTablet;

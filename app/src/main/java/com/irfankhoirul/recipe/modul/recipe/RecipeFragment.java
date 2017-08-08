@@ -16,7 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ import butterknife.ButterKnife;
 public class RecipeFragment extends LifecycleFragment
         implements RecipeContract.View, RecipeAdapter.RecipeClickListener {
 
-    private static final int WRITE_STORAGE_PERMISSION_REQUEST_CODE = 100;
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 100;
 
     @BindView(R.id.rv_recipes)
     RecyclerView rvRecipes;
@@ -74,10 +73,15 @@ public class RecipeFragment extends LifecycleFragment
 
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
             showPermissionDialog();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
             showPermissionDialog();
         } else {
             mViewModel.loadRecipes(0);
@@ -94,14 +98,8 @@ public class RecipeFragment extends LifecycleFragment
 
         int column = deviceWidthInDp / 300;
         int totalMarginInDp = marginInDp * (column + 1);
-        int cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column; //Salah
+        int cardWidthInDp = (deviceWidthInDp - totalMarginInDp) / column;
         int cardHeightInDp = (int) (2.0f / 3.0f * cardWidthInDp);
-
-        Log.v("Column", String.valueOf(column));
-        Log.v("deviceWidthInDp", String.valueOf(deviceWidthInDp));
-        Log.v("totalMarginInDp", String.valueOf(totalMarginInDp));
-        Log.v("cardWidthInDp", String.valueOf(cardWidthInDp));
-        Log.v("cardHeightInDp", String.valueOf(cardHeightInDp));
 
         RecyclerViewMarginDecoration decoration =
                 new RecyclerViewMarginDecoration(RecyclerViewMarginDecoration.ORIENTATION_VERTICAL,
@@ -124,8 +122,10 @@ public class RecipeFragment extends LifecycleFragment
         dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        WRITE_STORAGE_PERMISSION_REQUEST_CODE);
+                requestPermissions(new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                }, STORAGE_PERMISSION_REQUEST_CODE);
             }
         });
         AlertDialog permissionDialog = dialogBuilder.create();
@@ -166,8 +166,10 @@ public class RecipeFragment extends LifecycleFragment
     public void onFavoriteClick(Recipe recipe, int position) {
         if (recipe.isFavorite()) {
             recipe.setFavorite(false);
+            mViewModel.setFavoriteRecipe(recipe, position);
         } else {
             recipe.setFavorite(true);
+            mViewModel.setFavoriteRecipe(recipe, position);
         }
         recipeAdapter.notifyItemChanged(position);
     }
@@ -177,8 +179,10 @@ public class RecipeFragment extends LifecycleFragment
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
-            case WRITE_STORAGE_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case STORAGE_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     mViewModel.loadRecipes(0);
                 } else {
                     showError("Permission not granted");
