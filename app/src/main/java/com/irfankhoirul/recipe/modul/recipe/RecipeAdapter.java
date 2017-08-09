@@ -1,15 +1,17 @@
 package com.irfankhoirul.recipe.modul.recipe;
 
-import android.support.constraint.ConstraintLayout;
+import android.support.annotation.Nullable;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.florent37.glidepalette.BitmapPalette;
 import com.github.florent37.glidepalette.GlidePalette;
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
@@ -52,6 +54,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Recipe recipe = recipes.get(position);
 
         holder.tvTitle.setText(recipe.getName());
+        holder.tvServing.setText(String.valueOf(recipe.getServings()));
 
         if (recipe.isFavorite()) {
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -73,7 +76,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.cvRecipe.setLayoutParams(layoutParams);
     }
 
-    private void setImageThumbnail(RecipeViewHolder holder, String url) {
+    private void setImageThumbnail(final RecipeViewHolder holder, String url) {
         GlideApp.with(holder.ivThumbnail)
                 .load(url)
                 .placeholder(R.drawable.ic_food_placeholder)
@@ -81,6 +84,18 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                         .use(GlidePalette.Profile.MUTED)
                         .intoBackground(holder.vFooter, GlidePalette.Swatch.RGB)
                         .intoTextColor(holder.tvTitle, GlidePalette.Swatch.BODY_TEXT_COLOR)
+                        .intoTextColor(holder.tvServing, GlidePalette.Swatch.BODY_TEXT_COLOR)
+                        .intoCallBack(new BitmapPalette.CallBack() {
+                            @Override
+                            public void onPaletteLoaded(@Nullable Palette palette) {
+                                if (palette != null && palette.getMutedSwatch() != null) {
+                                    holder.ivFavorite.setColorFilter(palette.getMutedSwatch()
+                                            .getBodyTextColor());
+                                    holder.ivServing.setColorFilter(palette.getMutedSwatch()
+                                            .getBodyTextColor());
+                                }
+                            }
+                        })
                         .crossfade(true)
                 )
                 .into(holder.ivThumbnail);
@@ -101,8 +116,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         @BindView(R.id.cv_recipe)
         CardView cvRecipe;
-        @BindView(R.id.cl_recipe_container)
-        ConstraintLayout clRecipeContainer;
+        @BindView(R.id.rl_recipe_container)
+        RelativeLayout rlRecipeContainer;
         @BindView(R.id.iv_thumbnail)
         ImageView ivThumbnail;
         @BindView(R.id.v_footer)
@@ -111,6 +126,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         TextView tvTitle;
         @BindView(R.id.iv_favorite)
         ImageView ivFavorite;
+        @BindView(R.id.iv_serving)
+        ImageView ivServing;
+        @BindView(R.id.tv_serving)
+        TextView tvServing;
 
         RecipeViewHolder(View itemView) {
             super(itemView);
@@ -129,7 +148,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         @Override
         public void onClick(View v) {
-            Log.v("ConstraintLayout", "Clicked!");
             clickListener.onRecipeItemClick(recipes.get(getAdapterPosition()));
         }
     }
