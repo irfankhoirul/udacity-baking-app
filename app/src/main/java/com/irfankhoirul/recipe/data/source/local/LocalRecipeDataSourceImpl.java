@@ -93,7 +93,6 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
                 recipes.get(recipePosition).getId();
         Uri ingredientUri = Uri.parse(ingredientUriString);
 
-        Log.v("IngredientUri", ingredientUri.toString());
         Cursor ingredientCursor = context.getContentResolver()
                 .query(ingredientUri,
                         null,
@@ -105,7 +104,6 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
         if (ingredientCursor != null) {
             while (ingredientCursor.moveToNext()) {
                 Ingredient ingredient = getIngredientFromCursor(ingredientCursor);
-                Log.v("IngredientFromCursor", ingredient.toString());
                 ingredients.add(ingredient);
             }
             ingredientCursor.close();
@@ -122,8 +120,6 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
         String stepUriString = baseStepUri.toString() + "/" + recipes.get(recipePosition).getId();
         Uri stepUri = Uri.parse(stepUriString);
 
-        Log.v("StepUri", stepUri.toString());
-
         Cursor stepCursor = context.getContentResolver()
                 .query(stepUri,
                         null,
@@ -135,7 +131,6 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
         if (stepCursor != null) {
             while (stepCursor.moveToNext()) {
                 Step step = getStepFromCursor(stepCursor);
-                Log.v("StepFromCursor", step.toString());
                 steps.add(step);
             }
             stepCursor.close();
@@ -258,7 +253,6 @@ public class LocalRecipeDataSourceImpl implements LocalRecipeDataSource {
                 for (int i = 0; i < recipes.size(); i++) {
                     Recipe recipe = recipes.get(i);
                     insertSingleRecipe(e, recipe);
-                    Log.v("InsertRecipe", String.valueOf(i));
                 }
                 e.onComplete();
             }
