@@ -32,7 +32,7 @@
         </receiver>
 
         <provider
-            android:name=".data.source.local.cache.db.RecipeContentProvider"
+            android:name=".data.source.local.db.RecipeContentProvider"
             android:authorities="com.irfankhoirul.recipe"
             android:exported="true" />
 

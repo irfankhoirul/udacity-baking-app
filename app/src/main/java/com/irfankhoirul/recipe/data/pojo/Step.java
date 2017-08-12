@@ -9,7 +9,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.

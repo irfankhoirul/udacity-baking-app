@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local.cache;
+package com.irfankhoirul.recipe.data.source.local;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Step;
-import com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import java.util.ArrayList;
 

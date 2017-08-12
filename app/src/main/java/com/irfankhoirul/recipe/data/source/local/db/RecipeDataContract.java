@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local.cache.db;
+package com.irfankhoirul.recipe.data.source.local.db;
 
 import android.net.Uri;
 import android.provider.BaseColumns;

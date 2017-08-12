@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.irfankhoirul.recipe.data.source.local.cache;
+package com.irfankhoirul.recipe.data.source.local;
 
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;

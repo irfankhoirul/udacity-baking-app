@@ -11,7 +11,7 @@ import android.widget.RemoteViewsService;
 
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
-import com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract;
+import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
 
 import java.util.ArrayList;
 

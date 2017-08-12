@@ -4,9 +4,9 @@ import android.app.Application;
 import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
-import com.irfankhoirul.recipe.data.source.local.cache.LocalDataObserver;
-import com.irfankhoirul.recipe.data.source.local.cache.LocalRecipeDataSource;
-import com.irfankhoirul.recipe.data.source.local.cache.LocalRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.local.LocalDataObserver;
+import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSource;
+import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSourceImpl;
 
 import java.util.ArrayList;
 
