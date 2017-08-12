@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local.db;
+package com.irfankhoirul.recipe.data.source.local.cache.db;
 
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
@@ -18,9 +18,9 @@ import android.util.Log;
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Step;
-import com.irfankhoirul.recipe.data.source.local.db.dao.IngredientDao;
-import com.irfankhoirul.recipe.data.source.local.db.dao.RecipeDao;
-import com.irfankhoirul.recipe.data.source.local.db.dao.StepDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.IngredientDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.RecipeDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.StepDao;
 
 import java.util.ArrayList;
 

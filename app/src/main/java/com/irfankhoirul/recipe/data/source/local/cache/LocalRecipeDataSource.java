@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local;
+package com.irfankhoirul.recipe.data.source.local.cache;
 
 import android.database.Cursor;
 import android.net.Uri;

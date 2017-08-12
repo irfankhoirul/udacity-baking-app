@@ -13,9 +13,9 @@ import android.support.annotation.NonNull;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
-import com.irfankhoirul.recipe.data.source.local.LocalDataObserver;
-import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSource;
-import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSourceImpl;
+import com.irfankhoirul.recipe.data.source.local.cache.LocalDataObserver;
+import com.irfankhoirul.recipe.data.source.local.cache.LocalRecipeDataSource;
+import com.irfankhoirul.recipe.data.source.local.cache.LocalRecipeDataSourceImpl;
 import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeDataSource;
 import com.irfankhoirul.recipe.data.source.remote.RemoteRecipeDataSourceImpl;
 import com.irfankhoirul.recipe.data.source.remote.RemoteResponseListener;
@@ -136,6 +136,16 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
     @Override
     public void setFavoriteRecipe(Recipe recipe, int position) {
         localRecipeDataSource.update(recipes.get(position), new LocalDataObserver<Integer>());
+    }
+
+    @Override
+    public Recipe getRecipeById(long recipeId) {
+        for (int i = 0; i < recipes.size(); i++) {
+            if (recipes.get(i).getId() == recipeId) {
+                return recipes.get(i);
+            }
+        }
+        return null;
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

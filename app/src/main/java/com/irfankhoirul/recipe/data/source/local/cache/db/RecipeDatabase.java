@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local.db;
+package com.irfankhoirul.recipe.data.source.local.cache.db;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
@@ -9,9 +9,9 @@ import android.support.annotation.VisibleForTesting;
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Step;
-import com.irfankhoirul.recipe.data.source.local.db.dao.IngredientDao;
-import com.irfankhoirul.recipe.data.source.local.db.dao.RecipeDao;
-import com.irfankhoirul.recipe.data.source.local.db.dao.StepDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.IngredientDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.RecipeDao;
+import com.irfankhoirul.recipe.data.source.local.cache.db.dao.StepDao;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.

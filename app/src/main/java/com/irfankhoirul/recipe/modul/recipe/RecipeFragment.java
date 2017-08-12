@@ -53,6 +53,15 @@ public class RecipeFragment extends LifecycleFragment
         // Required empty public constructor
     }
 
+    public static RecipeFragment newInstance(long recipeId) {
+        RecipeFragment recipeFragment = new RecipeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putLong("recipeId", recipeId);
+        recipeFragment.setArguments(bundle);
+
+        return recipeFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -152,7 +161,13 @@ public class RecipeFragment extends LifecycleFragment
 
     @Override
     public void updateRecipeList() {
-        recipeAdapter.notifyDataSetChanged();
+        if (getArguments().getLong("recipeId", 0) != 0) {
+            Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+            intent.putExtra("recipe", mViewModel.getRecipeById(getArguments().getLong("recipeId", 0)));
+            startActivity(intent);
+        } else {
+            recipeAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

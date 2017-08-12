@@ -12,12 +12,12 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
+import com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED;
+import static com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract.RecipeEntry.COLUMN_DATE_ADDED;
 
 /**
  * Created by Irfan Khoirul on 7/25/2017.

@@ -25,5 +25,7 @@ public interface RecipeContract {
         ArrayList<Recipe> getLoadedRecipes();
 
         void setFavoriteRecipe(Recipe recipe, int position);
+
+        Recipe getRecipeById(long recipeId);
     }
 }

@@ -1,4 +1,4 @@
-package com.irfankhoirul.recipe.data.source.local.db.dao;
+package com.irfankhoirul.recipe.data.source.local.cache.db.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
@@ -7,7 +7,7 @@ import android.arch.persistence.room.Update;
 import android.database.Cursor;
 
 import com.irfankhoirul.recipe.data.pojo.Ingredient;
-import com.irfankhoirul.recipe.data.source.local.db.RecipeDataContract;
+import com.irfankhoirul.recipe.data.source.local.cache.db.RecipeDataContract;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 

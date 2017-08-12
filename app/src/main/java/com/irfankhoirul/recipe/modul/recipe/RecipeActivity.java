@@ -17,7 +17,7 @@ public class RecipeActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fl_container, new RecipeFragment())
+                    .replace(R.id.fl_container, RecipeFragment.newInstance(getIntent().getLongExtra("recipeId", 0L)))
                     .commit();
         }
     }

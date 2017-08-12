@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".modul.widget.RecipeWidget">
+        <receiver android:name=".modul.widget.RecipeWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -32,15 +32,19 @@
         </receiver>
 
         <provider
-            android:name=".data.source.local.db.RecipeContentProvider"
+            android:name=".data.source.local.cache.db.RecipeContentProvider"
             android:authorities="com.irfankhoirul.recipe"
-            android:exported="true"
-            android:permission="com.irfankhoirul.recipe.data.source.local.db.READ_WRITE" />
+            android:exported="true" />
 
         <activity android:name=".modul.step_detail.StepDetailActivity" />
         <activity
             android:name=".modul.recipe_detail.RecipeDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".modul.widget.RecipeChoiceActivity" />
+
+        <service
+            android:name=".modul.widget.RecipeWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>
