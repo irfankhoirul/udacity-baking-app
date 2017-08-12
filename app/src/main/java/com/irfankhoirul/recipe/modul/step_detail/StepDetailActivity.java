@@ -43,7 +43,8 @@ public class StepDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_step_detail);
         ButterKnife.bind(this);
 
-        if (getIntent() != null && getIntent().hasExtra("steps") && getIntent().hasExtra("currentStepIndex")) {
+        if (getIntent() != null && getIntent().hasExtra("steps") &&
+                getIntent().hasExtra("currentStepIndex")) {
             steps = getIntent().getParcelableArrayListExtra("steps");
             currentStepIndex = getIntent().getIntExtra("currentStepIndex", 0);
             setNavigationButton(currentStepIndex);

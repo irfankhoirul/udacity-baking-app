@@ -46,6 +46,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     SimpleExoPlayerView videoPlayerView;
     @BindView(R.id.pb_buffering)
     ProgressBar pbBuffering;
+
     private Step step;
     private boolean isTablet;
     private SimpleExoPlayer mExoPlayer;
@@ -115,7 +116,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                     initializeMediaSession();
                     if (step.getVideoURL() != null && !step.getVideoURL().equalsIgnoreCase("")) {
                         initializePlayer(savedInstanceState, Uri.parse(step.getVideoURL()));
-                    } else if (step.getThumbnailURL() != null && !step.getThumbnailURL().equalsIgnoreCase("")) {
+                    } else if (step.getThumbnailURL() != null &&
+                            !step.getThumbnailURL().equalsIgnoreCase("")) {
                         initializePlayer(savedInstanceState, Uri.parse(step.getThumbnailURL()));
                     }
                 }

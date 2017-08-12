@@ -28,6 +28,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_step_icon"
             android:tint="@color/colorAccent"
             app:srcCompat="@drawable/ic_circle_black_24dp" />
 

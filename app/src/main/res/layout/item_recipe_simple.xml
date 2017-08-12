@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:selectableItemBackground"
-    android:clickable="true"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_recipe_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
         android:ellipsize="end"
         android:fontFamily="sans-serif-medium"
         android:maxLines="1"

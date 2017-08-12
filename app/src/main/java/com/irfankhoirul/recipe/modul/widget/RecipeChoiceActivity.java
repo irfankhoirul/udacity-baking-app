@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.irfankhoirul.recipe.R;
@@ -27,8 +26,6 @@ public class RecipeChoiceActivity extends AppCompatActivity {
         recipeChoiceDialog.setDialogListener(new RecipeChoiceDialog.RecipeChoiceDialogListener() {
             @Override
             public void onDismiss(Recipe recipe) {
-//                RemoteViews views = new RemoteViews(getPackageName(), R.layout.recipe_widget);
-//                views.setTextViewText(R.id.tv_recipe_name, recipe.getName());
 
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(RecipeChoiceActivity.this);
                 RemoteViews remoteViews = new RemoteViews(RecipeChoiceActivity.this.getPackageName(), R.layout.recipe_widget);
@@ -36,34 +33,30 @@ public class RecipeChoiceActivity extends AppCompatActivity {
 
                 final int[] appWidgetIds = appWidgetManager.getAppWidgetIds(recipeWidget);
                 for (int appWidgetId : appWidgetIds) {
-                    Log.v("RecipeWidgetService", "appWidgetId:" + appWidgetId);
-                    Log.v("RecipeWidgetService", "intentAppWidgetId:" + getIntent().getIntExtra("widgetId", 0));
-//                      appWidgetManager.updateAppWidget(appWidgetId, SmallWidgetProvider.buildRemoteView(application, appWidgetId, whatEverYouNeed));
                     if (appWidgetId == getIntent().getIntExtra("widgetId", 0)) {
                         remoteViews.setTextViewText(R.id.tv_recipe_name, recipe.getName());
                         remoteViews.setViewVisibility(R.id.ll_no_recipe, GONE);
                         remoteViews.setViewVisibility(R.id.ll_ingredient, VISIBLE);
 
-                        // Set the GridWidgetService intent to act as the adapter for the GridView
-                        Intent intent = new Intent(RecipeChoiceActivity.this, RecipeWidgetService.class);
-//                intent.putExtra("recipeId", recipe.getId());
-                        intent.setData(Uri.fromParts("recipeId", String.valueOf(recipe.getId()), null));
-                        remoteViews.setRemoteAdapter(R.id.gv_ingredient, intent);
-                        // Set the PlantDetailActivity intent to launch when clicked
-                        Intent appIntent = new Intent(RecipeChoiceActivity.this, RecipeActivity.class);
-                        appIntent.putExtra("recipeId", recipe.getId());
-                        PendingIntent appPendingIntent = PendingIntent.getActivity(RecipeChoiceActivity.this, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        Intent remoteAdapterIntent = new Intent(RecipeChoiceActivity.this,
+                                RecipeWidgetService.class);
+                        remoteAdapterIntent.setData(Uri.fromParts("recipeId",
+                                String.valueOf(recipe.getId()), null));
+                        remoteViews.setRemoteAdapter(R.id.gv_ingredient, remoteAdapterIntent);
+                        Intent openAppIntent = new Intent(RecipeChoiceActivity.this,
+                                RecipeActivity.class);
+                        openAppIntent.putExtra("recipeId", recipe.getId());
+                        PendingIntent appPendingIntent = PendingIntent.getActivity(
+                                RecipeChoiceActivity.this, (int) recipe.getId(), openAppIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
                         remoteViews.setPendingIntentTemplate(R.id.gv_ingredient, appPendingIntent);
-                        // Handle empty gardens
                         remoteViews.setEmptyView(R.id.gv_ingredient, R.id.ll_no_recipe);
 
-//                        appWidgetManager.updateAppWidget(recipeWidget, remoteViews);
                         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
                         break;
                     }
                 }
-
 
                 RecipeChoiceActivity.this.finish();
             }

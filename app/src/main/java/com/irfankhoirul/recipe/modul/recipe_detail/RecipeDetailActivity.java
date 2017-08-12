@@ -69,8 +69,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
             ingredientFragment = IngredientFragment.newInstance(recipe.getIngredients());
             stepFragment = StepFragment.newInstance(recipe.getSteps(), isTablet);
         } else {
-            ingredientFragment = (IngredientFragment) fragmentManager.getFragment(savedInstanceState, "ingredientFragment");
-            stepFragment = (StepFragment) fragmentManager.getFragment(savedInstanceState, "stepFragment");
+            ingredientFragment = (IngredientFragment) fragmentManager
+                    .getFragment(savedInstanceState, "ingredientFragment");
+            stepFragment = (StepFragment) fragmentManager.getFragment(savedInstanceState,
+                    "stepFragment");
         }
 
         mSectionsPagerAdapter = new RecipeDetailViewPagerAdapter(

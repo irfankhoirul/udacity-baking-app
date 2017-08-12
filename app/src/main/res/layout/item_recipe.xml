@@ -22,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
+            android:contentDescription="@string/content_description_recipe_image_thumbnail"
             android:foreground="?android:selectableItemBackground"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/ic_food_placeholder" />
@@ -64,6 +65,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/v_footer"
+            android:contentDescription="@string/content_description_favorite_icon"
             android:paddingBottom="16dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -78,6 +80,7 @@
             android:layout_below="@+id/tv_title"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
+            android:contentDescription="@string/content_description_serving_icon"
             android:scaleX="0.8"
             android:scaleY="0.8"
             app:srcCompat="@drawable/ic_person_black_24dp" />

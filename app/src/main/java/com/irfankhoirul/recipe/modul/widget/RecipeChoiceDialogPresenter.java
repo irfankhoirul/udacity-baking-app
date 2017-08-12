@@ -1,7 +1,22 @@
+/*
+ * Copyright 2017.  Irfan Khoirul Muhlishin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.irfankhoirul.recipe.modul.widget;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.source.local.LocalDataObserver;
@@ -11,10 +26,6 @@ import com.irfankhoirul.recipe.data.source.local.LocalRecipeDataSourceImpl;
 import java.util.ArrayList;
 
 import io.reactivex.annotations.NonNull;
-
-/**
- * Created by Irfan Khoirul on 8/9/2017.
- */
 
 public class RecipeChoiceDialogPresenter implements RecipeChoiceContract.Presenter {
 
@@ -30,30 +41,23 @@ public class RecipeChoiceDialogPresenter implements RecipeChoiceContract.Present
     @Override
     public void loadRecipes() {
         if (recipes.size() == 0) {
-            Log.v("StartLoadRecipe", "True");
             // Try to Get From Cache First
             localRecipeDataSource.getAll(new LocalDataObserver<ArrayList<Recipe>>() {
                 @Override
                 public void onNext(@NonNull ArrayList<Recipe> cachedRecipes) {
-                    Log.v("LoadRecipe", "OnNext");
                     if (cachedRecipes != null && cachedRecipes.size() > 0) {
                         recipes.clear();
                         recipes.addAll(cachedRecipes);
-                        Log.v("RecipeLoaded", String.valueOf(cachedRecipes.size()));
                         view.updateRecipeList();
-                    } else {
-                        Log.v("Recipe", "IsEmpty");
                     }
                 }
 
                 @Override
                 public void onError(@NonNull Throwable e) {
                     super.onError(e);
-                    Log.v("LoadRecipe", "OnError");
                 }
             });
         } else {
-            Log.v("Recipe", "NotHaveToBeLoaded");
             view.updateRecipeList();
         }
     }

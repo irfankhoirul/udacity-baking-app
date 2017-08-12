@@ -10,7 +10,7 @@
         android:background="@color/colorPrimary"
         android:fontFamily="sans-serif-medium"
         android:padding="16dp"
-        android:text="Available Recipes : "
+        android:text="@string/label_available_recipes"
         android:textColor="@color/pure_white"
         android:textSize="18sp" />
 
