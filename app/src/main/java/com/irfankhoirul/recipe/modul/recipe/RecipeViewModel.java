@@ -58,7 +58,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
     }
 
     @Override
-    public void loadRecipes(int source) {
+    public void loadRecipes() {
         mView.setLoading(true, "Preparing Recipes...");
         if (recipes.size() == 0) {
             // Try to Get From Cache First
@@ -108,6 +108,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
             @Override
             public void onFailure(Throwable throwable) {
                 mView.setLoading(false, null);
+                mView.showNoConnection();
             }
         });
     }

@@ -77,6 +77,7 @@ public class RemoteRecipeDataSourceImpl implements RemoteRecipeDataSource {
             public void onFailure(@NonNull Call<ArrayList<Recipe>> call,
                                   @NonNull Throwable t) {
                 t.printStackTrace();
+                responseListener.onFailure(t);
             }
         });
     }

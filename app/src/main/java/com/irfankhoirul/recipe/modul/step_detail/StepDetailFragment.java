@@ -20,12 +20,15 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -62,7 +65,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     SimpleExoPlayerView videoPlayerView;
     @BindView(R.id.pb_buffering)
     ProgressBar pbBuffering;
-
+    @BindView(R.id.ll_container)
+    LinearLayout llContainer;
     private Step step;
     private boolean isTablet;
     private SimpleExoPlayer mExoPlayer;
@@ -222,7 +226,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         }
     }
 
-
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
 
@@ -258,11 +261,24 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-
+        showError("Cannot play! Check your internet connection.");
     }
 
     @Override
     public void onPositionDiscontinuity() {
 
+    }
+
+    public void showError(String message) {
+        Snackbar snackbar = Snackbar
+                .make(llContainer, message, Snackbar.LENGTH_LONG);
+
+        snackbar.setActionTextColor(ContextCompat.getColor(getActivity(), R.color.red_700));
+
+        View sbView = snackbar.getView();
+        sbView.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.red_100));
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_700));
+        snackbar.show();
     }
 }

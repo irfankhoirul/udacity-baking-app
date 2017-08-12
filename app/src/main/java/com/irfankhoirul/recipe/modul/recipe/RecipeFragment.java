@@ -33,6 +33,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,21 +45,31 @@ import com.irfankhoirul.recipe.util.RecyclerViewMarginDecoration;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.irfankhoirul.recipe.R.id.rv_recipes;
 
 public class RecipeFragment extends LifecycleFragment
         implements RecipeContract.View, RecipeAdapter.RecipeClickListener {
 
+    private static final int STATE_NO_CONNECTION = 1;
+    private static final int STATE_OK = 2;
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 100;
 
-    @BindView(R.id.rv_recipes)
+    @BindView(rv_recipes)
     RecyclerView rvRecipes;
     @BindView(R.id.ll_loading)
     LinearLayout llLoading;
+    @BindView(R.id.ll_offline)
+    LinearLayout llOffline;
     @BindView(R.id.tv_loading_message)
     TextView tvLoadingMessage;
+    @BindView(R.id.bt_refresh)
+    Button btRefresh;
 
     private RecipeViewModel mViewModel;
     private RecipeAdapter recipeAdapter;
+    private int state;
 
     public RecipeFragment() {
         // Required empty public constructor
@@ -79,7 +90,25 @@ public class RecipeFragment extends LifecycleFragment
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         ButterKnife.bind(this, view);
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getInt("state") == STATE_NO_CONNECTION) {
+                showNoConnection();
+            }
+        }
+
         return view;
+    }
+
+    @OnClick(R.id.bt_refresh)
+    public void refresh() {
+        llOffline.setVisibility(View.GONE);
+        mViewModel.loadRecipes();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("state", state);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -104,7 +133,7 @@ public class RecipeFragment extends LifecycleFragment
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
             showPermissionDialog();
         } else {
-            mViewModel.loadRecipes(0);
+            mViewModel.loadRecipes();
         }
 
         setupRecyclerView();
@@ -172,6 +201,9 @@ public class RecipeFragment extends LifecycleFragment
 
     @Override
     public void updateRecipeList() {
+        state = STATE_OK;
+        llOffline.setVisibility(View.GONE);
+        rvRecipes.setVisibility(View.VISIBLE);
         if (getArguments().getLong("recipeId", 0) != 0) {
             Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
             intent.putExtra("recipe", mViewModel.getRecipeById(getArguments().getLong("recipeId", 0)));
@@ -179,6 +211,13 @@ public class RecipeFragment extends LifecycleFragment
         } else {
             recipeAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void showNoConnection() {
+        state = STATE_NO_CONNECTION;
+        rvRecipes.setVisibility(View.GONE);
+        llOffline.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -209,7 +248,7 @@ public class RecipeFragment extends LifecycleFragment
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    mViewModel.loadRecipes(0);
+                    mViewModel.loadRecipes();
                 } else {
                     showError("Permission not granted");
                 }

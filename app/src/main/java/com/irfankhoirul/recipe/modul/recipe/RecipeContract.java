@@ -29,10 +29,12 @@ public interface RecipeContract {
         void showError(String message);
 
         void updateRecipeList();
+
+        void showNoConnection();
     }
 
     interface ViewModel {
-        void loadRecipes(int source);
+        void loadRecipes();
 
         ArrayList<Recipe> getLoadedRecipes();
 
