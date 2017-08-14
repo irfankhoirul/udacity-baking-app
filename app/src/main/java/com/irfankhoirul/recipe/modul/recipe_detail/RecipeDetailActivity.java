@@ -25,7 +25,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
     Toolbar toolbar;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
-    @BindView(R.id.container)
+    @BindView(R.id.vp_container)
     ViewPager viewPager;
     FrameLayout flDetailStepContainer;
 

@@ -44,6 +44,7 @@ import retrofit2.Call;
 
 public class RecipeViewModel extends AndroidViewModel implements RecipeContract.ViewModel {
 
+    private static final int RECIPE_COUNT = 4;
     private final RecipeContract.View mView;
     private final RemoteRecipeDataSource remoteRecipeDataSource;
     private final LocalRecipeDataSource localRecipeDataSource;
@@ -65,14 +66,14 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
             localRecipeDataSource.getAll(new LocalDataObserver<ArrayList<Recipe>>() {
                 @Override
                 public void onNext(@io.reactivex.annotations.NonNull ArrayList<Recipe> cachedRecipes) {
-                    if (cachedRecipes != null && cachedRecipes.size() > 0) {
+                    if (cachedRecipes == null || cachedRecipes.size() != RECIPE_COUNT) {
+                        getRecipeFromRemote();
+                    } else {
                         getRecipeThumbnail(cachedRecipes);
                         recipes.clear();
                         recipes.addAll(cachedRecipes);
                         mView.setLoading(false, null);
                         mView.updateRecipeList();
-                    } else {
-                        getRecipeFromRemote();
                     }
                 }
 
@@ -85,6 +86,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
         } else {
             mView.setLoading(false, null);
             mView.updateRecipeList();
+            mView.setIdlingResourceStatus(true);
         }
     }
 
@@ -114,6 +116,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
     }
 
     private void getRecipeThumbnail(ArrayList<Recipe> result) {
+        ArrayList<Thumbnail> thumbnails = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {
             Recipe recipe = result.get(i);
             if (recipe.getImage() == null || recipe.getImage().isEmpty()) {
@@ -125,14 +128,22 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
                         break;
                     } else if (recipe.getSteps().get(j).getVideoURL() != null &&
                             !recipe.getSteps().get(j).getVideoURL().isEmpty()) {
-                        String[] params = new String[2];
-                        params[0] = recipe.getSteps().get(j).getVideoURL(); // url
-                        params[1] = String.valueOf(i); // position
-                        new GetVideoThumbnailTask().execute(params);
+//                        String[] params = new String[2];
+//                        params[0] = recipe.getSteps().get(j).getVideoURL(); // url
+//                        params[1] = String.valueOf(i); // position
+                        Thumbnail thumbnail = new Thumbnail();
+                        thumbnail.setPath(recipe.getSteps().get(j).getVideoURL());
+                        thumbnail.setPosition(i);
+                        thumbnails.add(thumbnail);
                         break;
                     }
                 }
             }
+        }
+        if (thumbnails.size() > 0) {
+            new GetVideoThumbnailTask().execute(thumbnails.toArray(new Thumbnail[thumbnails.size()]));
+        } else {
+            mView.setIdlingResourceStatus(true);
         }
     }
 
@@ -175,50 +186,56 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
 
         @Override
         public <T extends ViewModel> T create(Class<T> modelClass) {
-            //noinspection unchecked
             return (T) new RecipeViewModel(mApplication, mView);
         }
     }
 
-    private class GetVideoThumbnailTask extends AsyncTask<String, Void, Thumbnail> {
+    private class GetVideoThumbnailTask extends AsyncTask<Thumbnail, Void, Thumbnail[]> {
         @Override
-        protected Thumbnail doInBackground(String... strings) {
-            Bitmap bitmap = null;
-            MediaMetadataRetriever mediaMetadataRetriever = null;
-            try {
-                mediaMetadataRetriever = new MediaMetadataRetriever();
-                mediaMetadataRetriever.setDataSource(strings[0], new HashMap<String, String>());
-                bitmap = mediaMetadataRetriever.getFrameAtTime();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (mediaMetadataRetriever != null) {
-                    mediaMetadataRetriever.release();
+        protected Thumbnail[] doInBackground(Thumbnail... thumbnails) {
+            Thumbnail[] thumbnailResult = new Thumbnail[thumbnails.length];
+            for (int i = 0; i < thumbnails.length; i++) {
+                Bitmap bitmap = null;
+                MediaMetadataRetriever mediaMetadataRetriever = null;
+                try {
+                    mediaMetadataRetriever = new MediaMetadataRetriever();
+                    mediaMetadataRetriever.setDataSource(thumbnails[i].getPath(), new HashMap<String, String>());
+                    bitmap = mediaMetadataRetriever.getFrameAtTime();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (mediaMetadataRetriever != null) {
+                        mediaMetadataRetriever.release();
+                    }
                 }
+
+                String path = "";
+                if (bitmap != null) {
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bytes);
+                    path = MediaStore.Images.Media.insertImage(
+                            getApplication().getApplicationContext().getContentResolver(),
+                            bitmap, "tmp_recipe_thumb" + thumbnails[i].getPosition(), null);
+                }
+
+                Thumbnail thumbnail = new Thumbnail();
+                thumbnail.setPath(path);
+                thumbnail.setPosition(thumbnails[i].getPosition());
+                thumbnailResult[i] = thumbnail;
             }
 
-            String path = "";
-            if (bitmap != null) {
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, bytes);
-                path = MediaStore.Images.Media.insertImage(
-                        getApplication().getApplicationContext().getContentResolver(),
-                        bitmap, "tmp_recipe_thumb" + strings[1], null);
-            }
-
-            Thumbnail thumbnail = new Thumbnail();
-            thumbnail.setPath(path);
-            thumbnail.setPosition(Integer.parseInt(strings[1]));
-
-            return thumbnail;
+            return thumbnailResult;
         }
 
         @Override
-        protected void onPostExecute(Thumbnail result) {
-            recipes.get(result.getPosition()).setImage(result.getPath());
-            localRecipeDataSource.update(recipes.get(result.getPosition()),
-                    new LocalDataObserver<Integer>());
+        protected void onPostExecute(Thumbnail[] result) {
+            for (int i = 0; i < result.length; i++) {
+                recipes.get(result[i].getPosition()).setImage(result[i].getPath());
+                localRecipeDataSource.update(recipes.get(result[i].getPosition()),
+                        new LocalDataObserver<Integer>());
+            }
             mView.updateRecipeList();
+            mView.setIdlingResourceStatus(true);
         }
     }
 }

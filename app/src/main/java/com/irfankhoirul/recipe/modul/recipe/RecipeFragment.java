@@ -19,6 +19,7 @@ package com.irfankhoirul.recipe.modul.recipe;
 import android.Manifest;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -47,8 +48,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.irfankhoirul.recipe.R.id.rv_recipes;
-
 public class RecipeFragment extends LifecycleFragment
         implements RecipeContract.View, RecipeAdapter.RecipeClickListener {
 
@@ -56,7 +55,7 @@ public class RecipeFragment extends LifecycleFragment
     private static final int STATE_OK = 2;
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 100;
 
-    @BindView(rv_recipes)
+    @BindView(R.id.rv_recipes)
     RecyclerView rvRecipes;
     @BindView(R.id.ll_loading)
     LinearLayout llLoading;
@@ -70,6 +69,8 @@ public class RecipeFragment extends LifecycleFragment
     private RecipeViewModel mViewModel;
     private RecipeAdapter recipeAdapter;
     private int state;
+    private RecipeFragmentListener fragmentListener;
+    private AlertDialog permissionDialog;
 
     public RecipeFragment() {
         // Required empty public constructor
@@ -85,6 +86,12 @@ public class RecipeFragment extends LifecycleFragment
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
@@ -97,6 +104,21 @@ public class RecipeFragment extends LifecycleFragment
         }
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        fragmentListener = (RecipeFragmentListener) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (permissionDialog != null && permissionDialog.isShowing()) {
+            permissionDialog.dismiss();
+        }
+//        fragmentListener = null;
     }
 
     @OnClick(R.id.bt_refresh)
@@ -133,6 +155,7 @@ public class RecipeFragment extends LifecycleFragment
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
             showPermissionDialog();
         } else {
+            fragmentListener.onIdlingResourceStatusChanged(false);
             mViewModel.loadRecipes();
         }
 
@@ -166,9 +189,9 @@ public class RecipeFragment extends LifecycleFragment
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_permission, null);
         dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle("Storage Access Permission");
+        dialogBuilder.setTitle(R.string.dialog_title_storage_permission);
 
-        dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(R.string.label_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 requestPermissions(new String[]{
@@ -177,7 +200,7 @@ public class RecipeFragment extends LifecycleFragment
                 }, STORAGE_PERMISSION_REQUEST_CODE);
             }
         });
-        AlertDialog permissionDialog = dialogBuilder.create();
+        permissionDialog = dialogBuilder.create();
         permissionDialog.setCancelable(false);
         permissionDialog.show();
     }
@@ -218,6 +241,13 @@ public class RecipeFragment extends LifecycleFragment
         state = STATE_NO_CONNECTION;
         rvRecipes.setVisibility(View.GONE);
         llOffline.setVisibility(View.VISIBLE);
+
+        fragmentListener.onIdlingResourceStatusChanged(true);
+    }
+
+    @Override
+    public void setIdlingResourceStatus(boolean isIdle) {
+        fragmentListener.onIdlingResourceStatusChanged(isIdle);
     }
 
     @Override
@@ -254,5 +284,9 @@ public class RecipeFragment extends LifecycleFragment
                 }
             }
         }
+    }
+
+    public interface RecipeFragmentListener {
+        void onIdlingResourceStatusChanged(boolean isIdle);
     }
 }

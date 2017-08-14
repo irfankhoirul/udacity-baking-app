@@ -12,4 +12,6 @@
     <string name="label_available_recipes">Available Recipes : </string>
     <string name="label_offline">Could not load data\nPlease check your internet connection</string>
     <string name="label_refresh">Refresh</string>
+    <string name="dialog_title_storage_permission">Storage Access Permission</string>
+    <string name="label_ok">OK</string>
 </resources>

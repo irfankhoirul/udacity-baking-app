@@ -31,6 +31,8 @@ public interface RecipeContract {
         void updateRecipeList();
 
         void showNoConnection();
+
+        void setIdlingResourceStatus(boolean isIdle);
     }
 
     interface ViewModel {
