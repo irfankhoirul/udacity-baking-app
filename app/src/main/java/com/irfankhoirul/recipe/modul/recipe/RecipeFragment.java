@@ -241,8 +241,6 @@ public class RecipeFragment extends LifecycleFragment
         state = STATE_NO_CONNECTION;
         rvRecipes.setVisibility(View.GONE);
         llOffline.setVisibility(View.VISIBLE);
-
-        fragmentListener.onIdlingResourceStatusChanged(true);
     }
 
     @Override

@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
@@ -86,6 +87,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
         } else {
             mView.setLoading(false, null);
             mView.updateRecipeList();
+            Log.d("SetIdlingTrue", "1");
             mView.setIdlingResourceStatus(true);
         }
     }
@@ -143,6 +145,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
         if (thumbnails.size() > 0) {
             new GetVideoThumbnailTask().execute(thumbnails.toArray(new Thumbnail[thumbnails.size()]));
         } else {
+            Log.d("SetIdlingTrue", "2");
             mView.setIdlingResourceStatus(true);
         }
     }
@@ -235,6 +238,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
                         new LocalDataObserver<Integer>());
             }
             mView.updateRecipeList();
+            Log.d("SetIdlingTrue", "3");
             mView.setIdlingResourceStatus(true);
         }
     }

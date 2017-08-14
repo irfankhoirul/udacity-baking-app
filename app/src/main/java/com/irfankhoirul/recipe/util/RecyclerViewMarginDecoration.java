@@ -23,7 +23,6 @@ import android.view.View;
 
 public class RecyclerViewMarginDecoration extends RecyclerView.ItemDecoration {
     public static final int ORIENTATION_VERTICAL = 1;
-    public static final int ORIENTATION_HORIZONTAL = 2;
     private final int columns;
     private int margin;
     private int orientation;
@@ -40,22 +39,13 @@ public class RecyclerViewMarginDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         int position = parent.getChildLayoutPosition(view);
         if (orientation == ORIENTATION_VERTICAL) {
-            outRect.right = margin;
             outRect.bottom = margin;
+            outRect.right = margin;
             if (position < columns) {
                 outRect.top = margin;
             }
             if (position % columns == 0) {
                 outRect.left = margin;
-            }
-        } else if (orientation == ORIENTATION_HORIZONTAL) {
-            outRect.bottom = margin;
-            outRect.right = margin;
-            if (position < columns) {
-                outRect.left = 0;
-            }
-            if (position % columns == 0) {
-                outRect.top = margin;
             }
         }
     }

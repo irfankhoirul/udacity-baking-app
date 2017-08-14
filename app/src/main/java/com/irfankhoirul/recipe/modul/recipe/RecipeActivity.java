@@ -40,7 +40,7 @@ public class RecipeActivity extends AppCompatActivity implements RecipeFragment.
     @Override
     public void onIdlingResourceStatusChanged(boolean isIdle) {
         if (mIdlingResource != null) {
-            Log.d("SetIdlingResourceStatus", String.valueOf(isIdle));
+            Log.d("SetIdlingTrue", String.valueOf(isIdle));
             mIdlingResource.setIdleState(isIdle);
         }
     }

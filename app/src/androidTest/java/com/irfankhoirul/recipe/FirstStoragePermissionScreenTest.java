@@ -20,7 +20,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
- * Note : Run this test just once after app installed.
+ * Note : Run this test only once, just after app installed (permission have not been granted)
  * Do not run @{@link SecondActivityPhoneLayoutScreenTest} before running this test.
  */
 
