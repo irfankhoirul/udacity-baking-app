@@ -2,12 +2,14 @@ package com.irfankhoirul.recipe;
 
 import android.os.Build;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.irfankhoirul.recipe.modul.recipe.RecipeActivity;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -24,6 +26,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  * Do not run @{@link SecondActivityPhoneLayoutScreenTest} before running this test.
  */
 
+@RunWith(AndroidJUnit4.class)
 public class FirstStoragePermissionScreenTest {
 
     @Rule

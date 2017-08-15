@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.irfankhoirul.recipe.data.pojo.Recipe;
 import com.irfankhoirul.recipe.data.pojo.Thumbnail;
@@ -87,8 +86,6 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
         } else {
             mView.setLoading(false, null);
             mView.updateRecipeList();
-            Log.d("SetIdlingTrue", "1");
-            mView.setIdlingResourceStatus(true);
         }
     }
 
@@ -142,11 +139,9 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
                 }
             }
         }
-        if (thumbnails.size() > 0) {
+
+        if (thumbnails.size() > 0 && !mView.isRunningTest()) {
             new GetVideoThumbnailTask().execute(thumbnails.toArray(new Thumbnail[thumbnails.size()]));
-        } else {
-            Log.d("SetIdlingTrue", "2");
-            mView.setIdlingResourceStatus(true);
         }
     }
 
@@ -193,7 +188,7 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
         }
     }
 
-    private class GetVideoThumbnailTask extends AsyncTask<Thumbnail, Void, Thumbnail[]> {
+    private class GetVideoThumbnailTask extends AsyncTask<Thumbnail, Thumbnail, Thumbnail[]> {
         @Override
         protected Thumbnail[] doInBackground(Thumbnail... thumbnails) {
             Thumbnail[] thumbnailResult = new Thumbnail[thumbnails.length];
@@ -225,21 +220,32 @@ public class RecipeViewModel extends AndroidViewModel implements RecipeContract.
                 thumbnail.setPath(path);
                 thumbnail.setPosition(thumbnails[i].getPosition());
                 thumbnailResult[i] = thumbnail;
+
+                publishProgress(thumbnail);
             }
 
             return thumbnailResult;
         }
 
         @Override
-        protected void onPostExecute(Thumbnail[] result) {
-            for (int i = 0; i < result.length; i++) {
-                recipes.get(result[i].getPosition()).setImage(result[i].getPath());
-                localRecipeDataSource.update(recipes.get(result[i].getPosition()),
-                        new LocalDataObserver<Integer>());
-            }
+        protected void onProgressUpdate(Thumbnail... values) {
+            super.onProgressUpdate(values);
+            Thumbnail thumbnail = values[0];
+
+            recipes.get(values[0].getPosition()).setImage(values[0].getPath());
+            localRecipeDataSource.update(recipes.get(values[0].getPosition()),
+                    new LocalDataObserver<Integer>());
             mView.updateRecipeList();
-            Log.d("SetIdlingTrue", "3");
-            mView.setIdlingResourceStatus(true);
+        }
+
+        @Override
+        protected void onPostExecute(Thumbnail[] result) {
+//            for (int i = 0; i < result.length; i++) {
+//                recipes.get(result[i].getPosition()).setImage(result[i].getPath());
+//                localRecipeDataSource.update(recipes.get(result[i].getPosition()),
+//                        new LocalDataObserver<Integer>());
+//            }
+            mView.updateRecipeList();
         }
     }
 }

@@ -3,6 +3,8 @@
     package="com.irfankhoirul.recipe">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Storage access permission is needed in order to make image thumbnail cache from video -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -16,7 +18,6 @@
         <activity android:name=".modul.recipe.RecipeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,7 +26,6 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/recipe_widget_info" />
@@ -36,7 +36,11 @@
             android:authorities="com.irfankhoirul.recipe"
             android:exported="true" />
 
-        <activity android:name=".modul.step_detail.StepDetailActivity" />
+        <activity
+            android:name=".modul.step_detail.StepDetailActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".modul.recipe_detail.RecipeDetailActivity"
             android:theme="@style/AppTheme.NoActionBar" />

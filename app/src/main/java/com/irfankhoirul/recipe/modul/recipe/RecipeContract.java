@@ -33,6 +33,8 @@ public interface RecipeContract {
         void showNoConnection();
 
         void setIdlingResourceStatus(boolean isIdle);
+
+        boolean isRunningTest();
     }
 
     interface ViewModel {

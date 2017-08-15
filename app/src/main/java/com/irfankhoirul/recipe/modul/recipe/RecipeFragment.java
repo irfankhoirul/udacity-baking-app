@@ -71,6 +71,7 @@ public class RecipeFragment extends LifecycleFragment
     private int state;
     private RecipeFragmentListener fragmentListener;
     private AlertDialog permissionDialog;
+    private boolean runningTest;
 
     public RecipeFragment() {
         // Required empty public constructor
@@ -155,7 +156,7 @@ public class RecipeFragment extends LifecycleFragment
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
             showPermissionDialog();
         } else {
-            fragmentListener.onIdlingResourceStatusChanged(false);
+            setIdlingResourceStatus(false);
             mViewModel.loadRecipes();
         }
 
@@ -211,9 +212,11 @@ public class RecipeFragment extends LifecycleFragment
             rvRecipes.setVisibility(View.GONE);
             tvLoadingMessage.setText(message);
             llLoading.setVisibility(View.VISIBLE);
+            setIdlingResourceStatus(false);
         } else {
             llLoading.setVisibility(View.GONE);
             rvRecipes.setVisibility(View.VISIBLE);
+            setIdlingResourceStatus(true);
         }
     }
 
@@ -234,6 +237,8 @@ public class RecipeFragment extends LifecycleFragment
         } else {
             recipeAdapter.notifyDataSetChanged();
         }
+
+        setIdlingResourceStatus(true);
     }
 
     @Override
@@ -246,6 +251,15 @@ public class RecipeFragment extends LifecycleFragment
     @Override
     public void setIdlingResourceStatus(boolean isIdle) {
         fragmentListener.onIdlingResourceStatusChanged(isIdle);
+    }
+
+    @Override
+    public boolean isRunningTest() {
+        return runningTest;
+    }
+
+    public void setRunningTest(boolean runningTest) {
+        this.runningTest = runningTest;
     }
 
     @Override

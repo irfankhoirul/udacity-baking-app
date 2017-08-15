@@ -1,9 +1,11 @@
 package com.irfankhoirul.recipe;
 
-import android.support.test.espresso.IdlingRegistry;
+import android.os.Build;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.irfankhoirul.recipe.modul.recipe.RecipeActivity;
 import com.irfankhoirul.recipe.modul.recipe_detail.RecipeDetailActivity;
@@ -11,9 +13,13 @@ import com.irfankhoirul.recipe.modul.step_detail.StepDetailActivity;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
@@ -24,22 +30,33 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
- * Note : Do not run this test before run @{@link FirstStoragePermissionScreenTest}
+ * Note : Do not run this test before run @{@link FirstStoragePermissionScreenTest}.
+ * I've run this test several time and all of them were passed.
+ * If it failed, please run it again.
  */
 
+@RunWith(AndroidJUnit4.class)
 public class SecondActivityPhoneLayoutScreenTest {
 
     @Rule
     public IntentsTestRule<RecipeActivity> mActivityTestRule =
             new IntentsTestRule<>(RecipeActivity.class);
+
     private IdlingResource mIdlingResource;
+
+    @BeforeClass
+    public static void grantPhonePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getInstrumentation().getUiAutomation().executeShellCommand(
+                    "pm grant " + getTargetContext().getPackageName()
+                            + " android.permission.WRITE_EXTERNAL_STORAGE");
+        }
+    }
 
     @Before
     public void registerIdlingResource() {
         mIdlingResource = mActivityTestRule.getActivity().getIdlingResource();
-        // Deprecated
-//        Espresso.registerIdlingResources(mIdlingResource);
-        IdlingRegistry.getInstance().register(mIdlingResource);
+        Espresso.registerIdlingResources(mIdlingResource);
     }
 
     @Test
@@ -64,9 +81,7 @@ public class SecondActivityPhoneLayoutScreenTest {
     @After
     public void unregisterIdlingResource() {
         if (mIdlingResource != null) {
-            // Deprecated
-//            Espresso.unregisterIdlingResources(mIdlingResource);
-            IdlingRegistry.getInstance().unregister(mIdlingResource);
+            Espresso.unregisterIdlingResources(mIdlingResource);
         }
     }
 

@@ -59,6 +59,8 @@ import butterknife.ButterKnife;
 public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener {
 
     private static MediaSessionCompat mMediaSession;
+    @BindView(R.id.tv_step_short_description)
+    TextView tvStepShortDescription;
     @BindView(R.id.tv_step_description)
     TextView tvStepDescription;
     @BindView(R.id.video_player_view)
@@ -86,6 +88,32 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         return stepDetailFragment;
     }
 
+    public Step getCurrentStep() {
+        return step;
+    }
+
+    public void setOrientation(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ViewGroup.LayoutParams layoutParams =
+                    videoPlayerView.getLayoutParams();
+            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
+            layoutParams.height = DisplayMetricUtils.getDeviceHeight(getActivity());
+            videoPlayerView.setLayoutParams(layoutParams);
+
+            tvStepDescription.setVisibility(View.GONE);
+            tvStepShortDescription.setVisibility(View.GONE);
+        } else {
+            ViewGroup.LayoutParams layoutParams =
+                    videoPlayerView.getLayoutParams();
+            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
+            layoutParams.height = (int) (9.0f / 16.0f * layoutParams.width);
+            videoPlayerView.setLayoutParams(layoutParams);
+
+            tvStepDescription.setVisibility(View.VISIBLE);
+            tvStepShortDescription.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,29 +130,13 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             step = getArguments().getParcelable("step");
             isTablet = getArguments().getBoolean("isTablet");
             if (step != null) {
+                tvStepShortDescription.setText(step.getShortDescription());
                 tvStepDescription.setText(step.getDescription());
                 if ((step.getVideoURL() == null || step.getVideoURL().isEmpty()) &&
                         (step.getThumbnailURL() == null || step.getThumbnailURL().isEmpty())) {
                     videoPlayerView.setVisibility(View.GONE);
                 } else {
-                    if (!isTablet) {
-                        // Set fullscreen
-                        if (DisplayMetricUtils.getDeviceOrientation(getActivity()) ==
-                                Configuration.ORIENTATION_LANDSCAPE) {
-                            ViewGroup.LayoutParams layoutParams =
-                                    videoPlayerView.getLayoutParams();
-                            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
-                            layoutParams.height = DisplayMetricUtils.getDeviceHeight(getActivity());
-                            videoPlayerView.setLayoutParams(layoutParams);
-                            tvStepDescription.setVisibility(View.GONE);
-                        } else {
-                            ViewGroup.LayoutParams layoutParams =
-                                    videoPlayerView.getLayoutParams();
-                            layoutParams.width = DisplayMetricUtils.getDeviceWidth(getActivity());
-                            layoutParams.height = (int) (9.0f / 16.0f * layoutParams.width);
-                            videoPlayerView.setLayoutParams(layoutParams);
-                        }
-                    } else {
+                    if (isTablet) {
                         ViewGroup.LayoutParams layoutParams =
                                 videoPlayerView.getLayoutParams();
                         layoutParams.width = (int) (2.0f / 3.0f *
@@ -148,20 +160,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mExoPlayer != null) {
-            outState.putLong("currentVideoPosition", mExoPlayer.getCurrentPosition());
-        }
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onPause() {
+        super.onPause();
         releasePlayer();
-        if (mMediaSession != null) {
-            mMediaSession.setActive(false);
-        }
     }
 
     private void initializeMediaSession() {
@@ -202,9 +203,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
-            if (savedInstanceState != null) {
-                mExoPlayer.seekTo(savedInstanceState.getLong("currentVideoPosition"));
-            }
 
             videoPlayerView.setPlayer(mExoPlayer);
 
@@ -223,6 +221,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+        if (mMediaSession != null) {
+            mMediaSession.setActive(false);
         }
     }
 
@@ -261,7 +262,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        showError("Cannot play! Check your internet connection.");
+        showError(getString(R.string.label_no_internet));
     }
 
     @Override

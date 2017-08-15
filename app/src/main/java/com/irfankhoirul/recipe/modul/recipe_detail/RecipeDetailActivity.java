@@ -42,7 +42,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
         setContentView(R.layout.activity_recipe_detail);
         ButterKnife.bind(this);
 
-        recipe = getIntent().getParcelableExtra("recipe");
+        if (getIntent() != null && getIntent().hasExtra("recipe")) {
+            recipe = getIntent().getParcelableExtra("recipe");
+        }
 
         setupToolbar();
 

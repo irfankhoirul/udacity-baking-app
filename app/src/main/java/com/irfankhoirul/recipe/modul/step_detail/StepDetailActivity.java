@@ -20,6 +20,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -50,10 +51,13 @@ public class StepDetailActivity extends AppCompatActivity {
     private int currentStepIndex;
     private StepDetailFragment fragment;
     private Bundle savedInstanceState;
+    private int orientation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v("Activity", "onCreate");
+
         this.savedInstanceState = savedInstanceState;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_step_detail);
@@ -75,7 +79,9 @@ public class StepDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        getSupportFragmentManager().putFragment(outState, "stepDetailFragment", fragment);
+        if (fragment.isAdded()) {
+            getSupportFragmentManager().putFragment(outState, "stepDetailFragment", fragment);
+        }
         outState.putInt("currentStepIndex", currentStepIndex);
         super.onSaveInstanceState(outState);
     }
@@ -83,20 +89,24 @@ public class StepDetailActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (DisplayMetricUtils.getDeviceOrientation(this) == Configuration.ORIENTATION_LANDSCAPE) {
-            if (hasFocus) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    getWindow().getDecorView().setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-                }
+        fragment.setOrientation(orientation);
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             }
             llStepNavigation.setVisibility(View.GONE);
             vHorizontal.setVisibility(View.GONE);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            llStepNavigation.setVisibility(View.VISIBLE);
+            vHorizontal.setVisibility(View.VISIBLE);
         }
     }
 
@@ -130,7 +140,11 @@ public class StepDetailActivity extends AppCompatActivity {
             }
         }
 
-        fragment = StepDetailFragment.newInstance(steps.get(stepIndex), false);
+        if (savedInstanceState != null) {
+            fragment = (StepDetailFragment) getSupportFragmentManager().getFragment(savedInstanceState, "stepDetailFragment");
+        } else {
+            fragment = StepDetailFragment.newInstance(steps.get(stepIndex), false);
+        }
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.rl_container, fragment)
@@ -149,5 +163,14 @@ public class StepDetailActivity extends AppCompatActivity {
         currentStepIndex = currentStepIndex - 1;
         setupFragment(savedInstanceState, currentStepIndex);
         setNavigationButton(currentStepIndex);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.v("Activity", "onConfigurationChanged");
+        Log.v("Configuration", String.valueOf(newConfig.orientation));
+        orientation = newConfig.orientation;
+        onWindowFocusChanged(true);
     }
 }

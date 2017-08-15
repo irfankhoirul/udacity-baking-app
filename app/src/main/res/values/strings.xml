@@ -14,4 +14,5 @@
     <string name="label_refresh">Refresh</string>
     <string name="dialog_title_storage_permission">Storage Access Permission</string>
     <string name="label_ok">OK</string>
+    <string name="label_no_internet">Cannot play! Check your internet connection.</string>
 </resources>
