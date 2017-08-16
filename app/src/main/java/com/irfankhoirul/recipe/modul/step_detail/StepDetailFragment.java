@@ -153,6 +153,25 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                         videoPlayerView.setLayoutParams(layoutParams);
                     }
 
+
+                    // In Previous Submit, i din't set default artwork for video player.
+                    // If there is a mp4 file in thumbnailURL, i didn't consider it as invalid data,
+                    // and i set media player source from thumbnailURL instead.
+                    /*
+                        initializeMediaSession();
+                        if (step.getVideoURL() != null && !step.getVideoURL().equalsIgnoreCase("")) {
+                            initializePlayer(savedInstanceState, Uri.parse(step.getVideoURL()));
+                        } else if (step.getThumbnailURL() != null &&
+                                !step.getThumbnailURL().equalsIgnoreCase("")) {
+                            initializePlayer(savedInstanceState, Uri.parse(step.getThumbnailURL()));
+                        }
+                    */
+
+
+                    // Now, i set thumbnailURL for video player default artwork.
+                    // If there is a mp4 file in thumbnailURL, i consider it as invalid data,
+                    // so default artwork won't be set and video player won't be shown
+                    // if there is no value in videoURL.
                     if (step.getThumbnailURL() != null && step.getThumbnailURL().length() >= 3 &&
                             !TextUtils.getExtension(step.getThumbnailURL()).equalsIgnoreCase("mp4")) {
 
