@@ -17,6 +17,7 @@
 package com.irfankhoirul.recipe.modul.step_detail;
 
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,6 +33,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -52,6 +57,9 @@ import com.google.android.exoplayer2.util.Util;
 import com.irfankhoirul.recipe.R;
 import com.irfankhoirul.recipe.data.pojo.Step;
 import com.irfankhoirul.recipe.util.DisplayMetricUtils;
+import com.irfankhoirul.recipe.util.GlideApp;
+import com.irfankhoirul.recipe.util.ImageUtils;
+import com.irfankhoirul.recipe.util.TextUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -145,12 +153,36 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                         videoPlayerView.setLayoutParams(layoutParams);
                     }
 
-                    initializeMediaSession();
+                    if (step.getThumbnailURL() != null && step.getThumbnailURL().length() >= 3 &&
+                            !TextUtils.getExtension(step.getThumbnailURL()).equalsIgnoreCase("mp4")) {
+
+                        GlideApp.with(this)
+                                .load(step.getThumbnailURL())
+                                .listener(new RequestListener<Drawable>() {
+                                    @Override
+                                    public boolean onLoadFailed(@Nullable GlideException e,
+                                                                Object model, Target<Drawable> target,
+                                                                boolean isFirstResource) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onResourceReady(Drawable resource, Object model,
+                                                                   Target<Drawable> target,
+                                                                   DataSource dataSource,
+                                                                   boolean isFirstResource) {
+                                        videoPlayerView.setDefaultArtwork(
+                                                ImageUtils.drawableToBitmap(resource));
+                                        return true;
+                                    }
+                                });
+                    }
+
                     if (step.getVideoURL() != null && !step.getVideoURL().equalsIgnoreCase("")) {
-                        initializePlayer(savedInstanceState, Uri.parse(step.getVideoURL()));
-                    } else if (step.getThumbnailURL() != null &&
-                            !step.getThumbnailURL().equalsIgnoreCase("")) {
-                        initializePlayer(savedInstanceState, Uri.parse(step.getThumbnailURL()));
+                        initializeMediaSession();
+                        initializePlayer(Uri.parse(step.getVideoURL()));
+                    } else {
+                        videoPlayerView.setVisibility(View.GONE);
                     }
                 }
             }
@@ -198,7 +230,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         mMediaSession.setActive(true);
     }
 
-    private void initializePlayer(Bundle savedInstanceState, Uri mediaUri) {
+    private void initializePlayer(Uri videoUri) {
         if (mExoPlayer == null) {
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
@@ -209,7 +241,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             mExoPlayer.addListener(this);
 
             String userAgent = Util.getUserAgent(getActivity(), "Recipe");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+            MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
