@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -15,6 +17,7 @@ import com.irfankhoirul.recipe.data.pojo.Step;
 import com.irfankhoirul.recipe.modul.ingredient.IngredientFragment;
 import com.irfankhoirul.recipe.modul.step.StepFragment;
 import com.irfankhoirul.recipe.modul.step_detail.StepDetailFragment;
+import com.irfankhoirul.recipe.util.DisplayMetricUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +53,13 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
 
         flDetailStepContainer = (FrameLayout) findViewById(R.id.fl_detail_step_container);
         isTablet = flDetailStepContainer != null;
+
+        if (isTablet) {
+            ViewGroup.LayoutParams layoutParams =
+                    tabLayout.getLayoutParams();
+            layoutParams.width = (int) (7.0f / 18.0f * DisplayMetricUtils.getDeviceWidth(this));
+            tabLayout.setLayoutParams(layoutParams);
+        }
 
         setupFragment(savedInstanceState);
 
@@ -94,5 +104,15 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepFragm
     @Override
     public void onStepClicked(Step step) {
         showDetailStepFragment(step);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

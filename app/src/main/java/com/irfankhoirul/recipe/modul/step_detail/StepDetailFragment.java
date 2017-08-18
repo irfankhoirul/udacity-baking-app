@@ -26,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private boolean isTablet;
     private SimpleExoPlayer mExoPlayer;
     private PlaybackStateCompat.Builder mStateBuilder;
+    private String videoUrl;
+    private long currentVideoPosition;
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -131,6 +134,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.v("OnCreateView", "TRUE");
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
         ButterKnife.bind(this, view);
 
@@ -153,25 +157,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                         videoPlayerView.setLayoutParams(layoutParams);
                     }
 
-
-                    // In Previous Submit, i din't set default artwork for video player.
-                    // If there is a mp4 file in thumbnailURL, i didn't consider it as invalid data,
-                    // and i set media player source from thumbnailURL instead.
-                    /*
-                        initializeMediaSession();
-                        if (step.getVideoURL() != null && !step.getVideoURL().equalsIgnoreCase("")) {
-                            initializePlayer(savedInstanceState, Uri.parse(step.getVideoURL()));
-                        } else if (step.getThumbnailURL() != null &&
-                                !step.getThumbnailURL().equalsIgnoreCase("")) {
-                            initializePlayer(savedInstanceState, Uri.parse(step.getThumbnailURL()));
-                        }
-                    */
-
-
-                    // Now, i set thumbnailURL for video player default artwork.
-                    // If there is a mp4 file in thumbnailURL, i consider it as invalid data,
-                    // so default artwork won't be set and video player won't be shown
-                    // if there is no value in videoURL.
                     if (step.getThumbnailURL() != null && step.getThumbnailURL().length() >= 3 &&
                             !TextUtils.getExtension(step.getThumbnailURL()).equalsIgnoreCase("mp4")) {
 
@@ -198,8 +183,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                     }
 
                     if (step.getVideoURL() != null && !step.getVideoURL().equalsIgnoreCase("")) {
-                        initializeMediaSession();
-                        initializePlayer(Uri.parse(step.getVideoURL()));
+                        videoUrl = step.getVideoURL();
+                        initializePlayer();
                     } else {
                         videoPlayerView.setVisibility(View.GONE);
                     }
@@ -213,54 +198,68 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onPause() {
         super.onPause();
+        currentVideoPosition = mExoPlayer.getCurrentPosition();
         releasePlayer();
     }
 
-    private void initializeMediaSession() {
-        mMediaSession = new MediaSessionCompat(getActivity(), "Recipe");
-        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mMediaSession.setMediaButtonReceiver(null);
-
-        mStateBuilder = new PlaybackStateCompat.Builder().setActions(
-                PlaybackStateCompat.ACTION_PLAY |
-                        PlaybackStateCompat.ACTION_PAUSE |
-                        PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-
-        mMediaSession.setCallback(new MediaSessionCompat.Callback() {
-            @Override
-            public void onPlay() {
-                mExoPlayer.setPlayWhenReady(true);
-            }
-
-            @Override
-            public void onPause() {
-                mExoPlayer.setPlayWhenReady(false);
-            }
-
-            @Override
-            public void onSkipToPrevious() {
-                mExoPlayer.seekTo(0);
-            }
-        });
-
-        mMediaSession.setActive(true);
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializePlayer();
     }
 
-    private void initializePlayer(Uri videoUri) {
-        if (mExoPlayer == null) {
+    private void initializePlayer() {
+        initializeMediaSession();
+        initializeVideoPlayer();
+    }
+
+    private void initializeMediaSession() {
+        if (mMediaSession == null) {
+            mMediaSession = new MediaSessionCompat(getActivity(), "Recipe");
+            mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                    MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+            mMediaSession.setMediaButtonReceiver(null);
+
+            mStateBuilder = new PlaybackStateCompat.Builder().setActions(
+                    PlaybackStateCompat.ACTION_PLAY |
+                            PlaybackStateCompat.ACTION_PAUSE |
+                            PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+            mMediaSession.setPlaybackState(mStateBuilder.build());
+
+            mMediaSession.setCallback(new MediaSessionCompat.Callback() {
+                @Override
+                public void onPlay() {
+                    mExoPlayer.setPlayWhenReady(true);
+                }
+
+                @Override
+                public void onPause() {
+                    mExoPlayer.setPlayWhenReady(false);
+                }
+
+                @Override
+                public void onSkipToPrevious() {
+                    mExoPlayer.seekTo(0);
+                }
+            });
+
+            mMediaSession.setActive(true);
+        }
+    }
+
+    private void initializeVideoPlayer() {
+        if (mExoPlayer == null && videoUrl != null) {
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
-
+            mExoPlayer.seekTo(currentVideoPosition);
             videoPlayerView.setPlayer(mExoPlayer);
 
             mExoPlayer.addListener(this);
 
             String userAgent = Util.getUserAgent(getActivity(), "Recipe");
-            MediaSource mediaSource = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(videoUrl), new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
@@ -308,7 +307,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         } else {
             pbBuffering.setVisibility(View.GONE);
         }
-        mMediaSession.setPlaybackState(mStateBuilder.build());
+        if (mStateBuilder != null) {
+            mMediaSession.setPlaybackState(mStateBuilder.build());
+        }
     }
 
     @Override

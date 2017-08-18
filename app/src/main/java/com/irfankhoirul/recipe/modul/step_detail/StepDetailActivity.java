@@ -165,11 +165,15 @@ public class StepDetailActivity extends AppCompatActivity {
         setNavigationButton(currentStepIndex);
     }
 
+    // In previous submission said that overriding onConfigurationChanged is not accepted,
+    // but i can't find the point tn the guideline which say like that.
+    // I override onConfigurationChanged in order to handle layout for landscape / portrait mode,
+    // since i have added orientation on android:configChanges in AndroidManifest in order to make
+    // this activity not recreated on orientation changes and make video player didn't recreated
+    // on orientation changes (based on example on https://github.com/google/ExoPlayer/blob/release-v2/demo/src/main/java/com/google/android/exoplayer2/demo/PlayerActivity.java).
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.v("Activity", "onConfigurationChanged");
-        Log.v("Configuration", String.valueOf(newConfig.orientation));
         orientation = newConfig.orientation;
         onWindowFocusChanged(true);
     }

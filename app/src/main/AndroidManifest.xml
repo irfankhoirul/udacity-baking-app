@@ -43,6 +43,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".modul.recipe_detail.RecipeDetailActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".modul.widget.RecipeChoiceActivity" />
 

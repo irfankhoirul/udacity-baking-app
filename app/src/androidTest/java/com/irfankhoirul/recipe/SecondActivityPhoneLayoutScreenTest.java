@@ -33,6 +33,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  * Note : Do not run this test before run @{@link FirstStoragePermissionScreenTest}.
  * I've run this test several time and all of them were passed.
  * If it failed, please run it again.
+ *
+ * Just run this on phone. Don't run on tablet.
  */
 
 @RunWith(AndroidJUnit4.class)
