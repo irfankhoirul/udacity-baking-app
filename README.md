@@ -1,4 +1,4 @@
-# Udacity Popular Movie
+# Udacity Baking App
 
 This is my version of Udacity's Baking App project. I build this as part of [Udacity Associate Android Developer Fast Track](https://www.udacity.com/course/associate-android-developer-fast-track--nd818) program i've enrolled.
 
